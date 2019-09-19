@@ -22,4 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from pyRAPL.pyRAPL import PyRAPL, PyRAPLException, PyRAPLNoEnergyConsumptionRecordedException
+from pyRAPL.pyRAPL import PyRAPLNoEnergyConsumptionRecordStartedException, PyRAPLCantRecordDRAMEnergyConsumption
+from pyRAPL.pyRAPL import PyRAPLCantRecordPKGEnergyConsumption
+
 __version__ = "0.0.1"

@@ -1,0 +1,93 @@
+# PyRAPL CircleCI configuration file
+version: 2.1
+jobs:
+  build:
+    docker:
+      # Language image for build and unit tests
+      - image: circleci/python:3.7
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "setup.cfg" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip3 install -e "."
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "setup.cfg" }}
+
+      # Run unit and integration tests
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            python3 setup.py test
+
+  publish-release:
+    docker:
+      - image: circleci/python:3.7
+
+    steps:
+      - checkout
+
+      - run:
+          name: check git tag with package version
+          command: |
+            python3 -c "import os, pyRAPL; exit(os.environ.get('CIRCLE_TAG', '?')[1:] != pyRAPL .__version__)"
+
+      - run:
+          name: prepare environment
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip3 install -U pip twine
+
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = powerapi" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+
+      - run:
+          name: generate package
+          command: |
+            python3 setup.py sdist bdist_wheel
+
+      - run:
+          name: upload to pypi
+          command: |
+            . venv/bin/activate
+            twine upload dist/*
+
+workflows:
+  version: 2
+  build-n-publish:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+
+      - publish-release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
