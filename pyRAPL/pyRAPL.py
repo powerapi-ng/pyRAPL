@@ -22,7 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import os
-import psutil
+import logging
+try:
+    import psutil
+except ImportError:
+    logging.getLogger().info("psutil is not installed.")
+
 
 from enum import Enum
 

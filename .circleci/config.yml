@@ -45,13 +45,6 @@ jobs:
       - checkout
 
       - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip3 install -e "."
-      
-      - run:
           name: check git tag with package version
           command: |
             python3 -c "import os, pyRAPL; exit(os.environ.get('CIRCLE_TAG', '?')[1:] != pyRAPL .__version__)"
