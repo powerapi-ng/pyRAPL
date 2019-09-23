@@ -24,6 +24,13 @@
 import os
 import psutil
 
+from enum import Enum
+
+class Device(Enum):
+    PKG = 1
+    DRAM = 2
+    GPU = 3
+
 
 class PyRAPLException(Exception):
     """Parent class of all PyRAPL exception
@@ -31,47 +38,48 @@ class PyRAPLException(Exception):
 
 
 class PyRAPLNoEnergyConsumptionRecordedException(PyRAPLException):
-    """Exception raised when a function get_record_*_result is executed without stoping consumption recording before
+    """Exception raised when a function recorded_energy() is executed without stoping consumption recording before
     """
 
 
 class PyRAPLNoEnergyConsumptionRecordStartedException(PyRAPLException):
-    """Exception raised when a function stop_record_* is executed without starting consumption recording before"""
+    """Exception raised when a function stop() is executed without starting consumption recording before"""
 
 
-class PyRAPLCantRecordDRAMEnergyConsumption(PyRAPLException):
-    """Exception raised when starting recording DRAM power consumption but no power consumption metric is available for
-    the DRAM device
+class PyRAPLCantRecordEnergyConsumption(PyRAPLException):
+    """Exception raised when starting recording power consumption for a device but no power consumption metric is
+    available for this device
     """
-
-
-class PyRAPLCantRecordPKGEnergyConsumption(PyRAPLException):
-    """Exception raised when starting recording package power consumption but no power consumption metric is available
-    for the package device
-    """
+    def __init__(self, device):
+        PyRAPLException.__init__(self)
+        self.device = device
 
 
 class PyRAPL:
     """
-    singleton that force the execution of the running process on a uniq package and retrieve package power consumption
+    singleton that force the execution of the running process on a unique package and retrieve package power consumption
     """
     instance = None
     already_init = False
 
     def __init__(self):
-        self.dram_file = None
-        self.pkg_file = None
+        self.sys_api = {
+            Device.PKG: None,
+            Device.DRAM: None,
+            Device.GPU: None
+        }
+        self.is_record_running = {
+            Device.PKG: False,
+            Device.DRAM: False,
+            Device.GPU: False
+        }
+        self.measure = {
+            Device.PKG: [None, None],
+            Device.DRAM: [None, None],
+            Device.GPU: [None, None]
+        }
         self.package_id = None
         self.siblings_cpu = None
-
-        self.dram_begin_measure = None
-        self.dram_end_measure = None
-
-        self.pkg_begin_measure = None
-        self.pkg_end_measure = None
-
-        self.pkg_started = False
-        self.dram_started = False
 
         if self.already_init is False:
             self.already_init = True
@@ -89,7 +97,7 @@ class PyRAPL:
     @staticmethod
     def _get_siblings_cpu():
         """
-        return the cpus that are on the same physical package that the cpu0
+        return the CPUs that are on the same physical package that the CPU0
         :return list:
         """
         f = open('/sys/devices/system/cpu/cpu0/topology/core_siblings_list')
@@ -104,8 +112,8 @@ class PyRAPL:
     @staticmethod
     def _force_cpu_execution_on(cpu_list):
         """
-        force the execution of the current process on the cpu given as parameter
-        :param cpu_list list: list of cpu id (int) where the current process can be executed
+        force the execution of the current process on the CPU given as parameter
+        :param cpu_list list: list of CPU id (int) where the current process can be executed
         """
         current_process = psutil.Process()
         current_process.cpu_affinity(cpu_list)
@@ -113,7 +121,7 @@ class PyRAPL:
     @staticmethod
     def _get_package_id():
         """
-        return physical package id of the cpu0
+        return physical package id of the CPU0
         :return int:
         """
         f = open('/sys/devices/system/cpu/cpu0/topology/physical_package_id')
@@ -123,21 +131,21 @@ class PyRAPL:
     def _open_rapl_files(self, package_id):
         """
         open the files corresponding to rapl kernel output for the corresponding package id
-        :param int package_id: package id corresponding
+        :param int package_id: corresponding package id
         """
         pkg_dir_name, pkg_rapl_id = self._get_pkg_directory_name(package_id)
         if pkg_dir_name is None:
-            self.pkg_file = None
-            self.dram_file = None
+            self.sys_api[Device.PKG] = None
+            self.sys_api[Device.DRAM] = None
             return
-        self.pkg_file = open(pkg_dir_name + '/energy_uj', 'r')
+        self.sys_api[Device.PKG] = open(pkg_dir_name + '/energy_uj', 'r')
 
         dram_dir_name = self._get_dram_directory_name(pkg_dir_name, pkg_rapl_id)
         if dram_dir_name is None:
-            self.dram_file = None
+            self.sys_api[Device.DRAM] = None
             return
 
-        self.dram_file = open(dram_dir_name + '/energy_uj', 'r')
+        self.sys_api[Device.DRAM] = open(dram_dir_name + '/energy_uj', 'r')
 
     def _get_pkg_directory_name(self, package_id):
         """
@@ -170,84 +178,67 @@ class PyRAPL:
             cls.instance = object.__new__(cls)
         return cls.instance
 
-    def get_energy_pkg(self):
+    def energy(self, device):
         """
-        return the amount of consumed energy by the cpu package since last CPU reset
-        :return int: the amount of consumed energy since last CPU reset in mJ
-        :raise PyRAPLCantRecordPKGEnergyConsumption: if no energy consumtion metric is available for package&
+        return the amount of consumed energy by the device given in parameter since last CPU reset
+        :param Device device: the device to get the power consumption
+        :return int: the amount of consumed energy of the device since last CPU reset in mJ
+        :raise PyRAPLCantRecordEnergyConsumption: if no energy consumtion metric is available for the given device
+        :raise TypeError: if device is not a Device parameter
         """
-        if self.pkg_file is None:
-            raise PyRAPLCantRecordPKGEnergyConsumption
+        if not isinstance(device, Device):
+            raise TypeError()
+        if self.sys_api[device] is None:
+            raise PyRAPLCantRecordEnergyConsumption(device)
 
-        self.pkg_file.seek(0, 0)
-        return int(self.pkg_file.readline())
+        api_file = self.sys_api[device]
+        api_file.seek(0, 0)
+        return int(api_file.readline())
 
-    def start_record_energy_pkg(self):
+    def record(self, devices):
         """
-        start recording the power consumption of the cpu package
-        :raise PyRAPLCantRecordPKGEnergyConsumption: if no energy consumtion metric is available for package
+        start recording the power consumption of the given devices
+        :param [Device] devices: list of device to record the power consumption
+        :raise PyRAPLCantRecordEnergyConsumption: if no energy consumtion metric is available for the given device
+        :raise TypeError: if a device in devices list is not a Device parameter
         """
-        self.pkg_begin_measure = self.get_energy_pkg()
-        self.pkg_started = True
+        for device in devices:
+            energy = self.energy(device)
+            self.measure[device][0] = energy
+            self.is_record_running[device] = True
 
-    def stop_record_energy_pkg(self):
+    def stop(self):
         """
-        stop recording the power consumption of the cpu package
-        :raise PyRAPLNoEnergyConsumptionRecordStartedException: if no energy consumtion metric is available for package
+        stop recording the power consumption
+        :raise PyRAPLNoEnergyConsumptionRecordStartedException: if no power consumption recording was started
         """
-        if not self.pkg_started:
-            raise PyRAPLNoEnergyConsumptionRecordStartedException
+        energy_recorded = False
 
-        self.pkg_end_measure = self.get_energy_pkg()
-        self.pkg_started = False
+        for device, is_running in self.is_record_running.items():
+            if is_running:
+                energy_recorded = True
+                self.is_record_running[device] = False
+                self.measure[device][1] = self.energy(device)
 
-    def get_record_pkg_result(self):
+        if not energy_recorded:
+            raise PyRAPLNoEnergyConsumptionRecordStartedException()
+
+
+    def recorded_energy(self, device):
         """
-        get the latest energy consumption recorded by PyRAPL for cpu package
-        :return: energy consumed between the last start_record_energy_pkg() and stop_record_energy_pkg() in mJ
+        get the latest energy consumption recorded by PyRAPL for the given device
+        :return: energy (in mJ) consumed between the last record() and stop() function call
         :raise PyRAPLNoEnergyConsumptionRecordedException: if no energy consumption was recorded
+        :raise TypeError: if device is not a Device parameter
         """
-        if self.pkg_begin_measure is None or self.pkg_end_measure is None:
+        if not isinstance(device, Device):
+            raise TypeError()
+
+        if self.measure[device][0] is None or self.measure[device][1] is None:
             raise PyRAPLNoEnergyConsumptionRecordedException
-        return self.pkg_end_measure - self.pkg_begin_measure
 
-    def start_record_energy_dram(self):
-        """
-        start recording the power consumption of the dram
-        :raise PyRAPLCantRecordDRAMEnergyConsumption: if no energy consumtion metric is available for dram
-        """
-        self.dram_begin_measure = self.get_energy_dram()
-        self.dram_started = True
+        measure = self.measure[device][1] - self.measure[device][0]
+        self.measure[device][0] = None
+        self.measure[device][1] = None
 
-    def stop_record_energy_dram(self):
-        """
-        stop recording the power consumption of the cpu dram
-        :raise PyRAPLNoEnergyConsumptionRecordStartedException: if no energy consumtion metric is available for package
-        """
-        if not self.dram_started:
-            raise PyRAPLNoEnergyConsumptionRecordStartedException
-
-        self.dram_end_measure = self.get_energy_dram()
-        self.dram_started = False
-
-    def get_record_dram_result(self):
-        """
-        get the latest energy consumption recorded by PyRAPL for dram
-        :return: energy consumed between the last start_record_energy_dram() and stop_record_energy_dram() in mJ
-        :raise PyRAPLNoEnergyConsumptionRecordedException: if no energy consumption was recorded
-        """
-        if self.dram_begin_measure is None or self.dram_end_measure is None:
-            raise PyRAPLNoEnergyConsumptionRecordedException
-        return self.dram_end_measure - self.dram_begin_measure
-
-    def get_energy_dram(self):
-        """
-        return the amount of consumed energy by the cpu dram since last CPU reset
-        :return int: the amount of consumed energy since last CPU reset in mJ
-        :raise PyRAPLCantRecordDRAMEnergyConsumption: if no energy consumtion metric is available for dram
-        """
-        if self.dram_file is None:
-            raise PyRAPLCantRecordDRAMEnergyConsumption
-
-        self.dram_file.seek(0, 0)
-        return int(self.dram_file.readline())
+        return measure
