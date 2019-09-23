@@ -23,6 +23,7 @@
 # SOFTWARE.
 import os
 import logging
+from math import ldexp
 try:
     import psutil
 except ImportError:
@@ -198,7 +199,7 @@ class PyRAPL:
 
         api_file = self.sys_api[device]
         api_file.seek(0, 0)
-        return int(api_file.readline())
+        return ldexp(int(api_file.readline()),-32)
 
     def record(self, devices):
         """
