@@ -11,7 +11,7 @@ from sys import argv
 def fun(n):
     sleep(n)
 
-@pyRAPL.measure
+@pyRAPL.measure(devices=pyRAPL.Device.TIME)
 def fun2(n):
     sleep(2*n)
 
