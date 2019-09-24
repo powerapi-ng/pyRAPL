@@ -11,12 +11,25 @@ from sys import argv
 def fun(n):
     sleep(n)
 
+@pyRAPL.measure
+def fun2(n):
+    sleep(2*n)
+
+
 
 def main1():
     n = int(argv[1]) if len(argv) >1 else 5 
     sensor = pyRAPL.PyRAPL()
     sensor.record([pyRAPL.Device.PKG, pyRAPL.Device.DRAM])
-    fun(n)
+    sleep(n)
+    sensor.stop()
+    # energy_pkg = sensor.recorded_energy(pyRAPL.Device.PKG)
+    # energy_dram = sensor.recorded_energy(pyRAPL.Device.DRAM)
+    # print("Energy PKG: %f , Energy DRAM: %f"%(energy_pkg,energy_dram))
+    print(sensor.recorded_energy())
+    sensor = pyRAPL.PyRAPL()
+    sensor.record([pyRAPL.Device.PKG, pyRAPL.Device.DRAM])
+    sleep(n)
     sensor.stop()
     # energy_pkg = sensor.recorded_energy(pyRAPL.Device.PKG)
     # energy_dram = sensor.recorded_energy(pyRAPL.Device.DRAM)
@@ -26,7 +39,12 @@ def main1():
 
 def main2():
     n = int(argv[1]) if len(argv) >1 else 5 
+    fun2(n)
+    print("fin f2")
+    fun(n)
+    print("fin f1")
     _,measures=fun(n)
+
     print(_)
     print(measures[pyRAPL.Device.DRAM])
 
