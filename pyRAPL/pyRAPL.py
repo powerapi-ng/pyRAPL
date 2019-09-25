@@ -23,11 +23,11 @@
 # SOFTWARE.
 import os
 import logging
-from math import ldexp
-import time 
+import time
 import functools
-import sys 
+from math import ldexp
 
+from enum import Enum
 
 try:
     import psutil
@@ -35,10 +35,7 @@ except ImportError:
     logging.getLogger().info("psutil is not installed.")
 
 
-from enum import Enum
-
 class Device(Enum):
-    TIME = 0
     PKG = 1
     DRAM = 2
     GPU = 3
@@ -71,44 +68,47 @@ class PyRAPL:
     """
     singleton that force the execution of the running process on a unique package and retrieve package power consumption
     """
-    instance = None
-    already_init = False
+    _instance = None
+    _already_init = False
+
+    def __new__(cls):
+        """use only one instance of PyRAPL"""
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+        return cls._instance
 
     def __init__(self):
 
-        self.is_record_running = {
-            Device.TIME : False,
+        self._is_record_running = {
             Device.PKG: False,
             Device.DRAM: False,
             Device.GPU: False
         }
         self._measure = {
-            Device.TIME : [None,None], 
             Device.PKG: [None, None],
             Device.DRAM: [None, None],
             Device.GPU: [None, None]
         }
-        self.package_id = None
-        self.siblings_cpu = None
+        self._package_id = None
+        self._siblings_cpu = None
 
-        if self.already_init is False:
-            self.already_init = True
+        if self._already_init is False:
+            self._already_init = True
             self._uniq_init()
 
     def _uniq_init(self):
         """
         Initialize the PyRAPL tool
         """
-        self.sys_api = {
-            # Device.TIME : None,
+        self._sys_api = {
             Device.PKG: None,
             Device.DRAM: None,
             Device.GPU: None
         }
-        self.siblings_cpu = PyRAPL._get_siblings_cpu()
-        self.package_id = PyRAPL._get_package_id()
-        PyRAPL._force_cpu_execution_on(self.siblings_cpu)
-        self._open_rapl_files(self.package_id)
+        self._siblings_cpu = PyRAPL._get_siblings_cpu()
+        self._package_id = PyRAPL._get_package_id()
+        PyRAPL._force_cpu_execution_on(self._siblings_cpu)
+        self._open_rapl_files(self._package_id)
 
     @staticmethod
     def _get_siblings_cpu():
@@ -151,17 +151,17 @@ class PyRAPL:
         """
         pkg_dir_name, pkg_rapl_id = self._get_pkg_directory_name(package_id)
         if pkg_dir_name is None:
-            self.sys_api[Device.PKG] = None
-            self.sys_api[Device.DRAM] = None
+            self._sys_api[Device.PKG] = None
+            self._sys_api[Device.DRAM] = None
             return
-        self.sys_api[Device.PKG] = open(pkg_dir_name + '/energy_uj', 'r')
+        self._sys_api[Device.PKG] = open(pkg_dir_name + '/energy_uj', 'r')
 
         dram_dir_name = self._get_dram_directory_name(pkg_dir_name, pkg_rapl_id)
         if dram_dir_name is None:
-            self.sys_api[Device.DRAM] = None
+            self._sys_api[Device.DRAM] = None
             return
 
-        self.sys_api[Device.DRAM] = open(dram_dir_name + '/energy_uj', 'r')
+        self._sys_api[Device.DRAM] = open(dram_dir_name + '/energy_uj', 'r')
 
     def _get_pkg_directory_name(self, package_id):
         """
@@ -188,45 +188,44 @@ class PyRAPL:
                 sub_id += 1
         return None
 
-    def __new__(cls):
-        """use only one instance of PyRAPL"""
-        if cls.instance is None:
-            cls.instance = object.__new__(cls)
-        return cls.instance
-
     def energy(self, device):
         """
         return the amount of consumed energy by the device given in parameter since last CPU reset
         :param Device device: the device to get the power consumption
         :return int: the amount of consumed energy of the device since last CPU reset in mJ
         :raise PyRAPLCantRecordEnergyConsumption: if no energy consumtion metric is available for the given device
-        :raise TypeError: if device is not a Device parameter
+        :raise TypeError: if device is not a Device instance
         """
-
 
         if not isinstance(device, Device):
             raise TypeError()
-        if device is Device.TIME : 
-            return time.perf_counter()
-            
-        if self.sys_api[device] is None:
-            raise PyRAPLCantRecordEnergyConsumption(device)
-        
-        api_file = self.sys_api[device]
-        api_file.seek(0, 0)
-        return ldexp(int(api_file.readline()),-32)
 
-    def record(self, devices):
+        if self._sys_api[device] is None:
+            raise PyRAPLCantRecordEnergyConsumption(device)
+
+        api_file = self._sys_api[device]
+        api_file.seek(0, 0)
+        return ldexp(int(api_file.readline()), -32)
+
+    def _begin_record(self, device):
+        energy = self.energy(device)
+        self._measure[device][0] = energy
+        self._is_record_running[device] = True
+
+    def record(self, *devices):
         """
         start recording the power consumption of the given devices
         :param [Device] devices: list of device to record the power consumption
         :raise PyRAPLCantRecordEnergyConsumption: if no energy consumtion metric is available for the given device
-        :raise TypeError: if a device in devices list is not a Device parameter
+        :raise TypeError: if a device in devices list is not a Device instance
         """
-        for device in devices:
-            energy = self.energy(device)
-            self._measure[device][0] = energy
-            self.is_record_running[device] = True
+        if devices:
+            for device in devices:
+                self._begin_record(device)
+        else:
+            for device, api_file in self._sys_api.items():
+                if api_file:
+                    self._begin_record(device)
 
     def stop(self):
         """
@@ -235,82 +234,97 @@ class PyRAPL:
         """
         energy_recorded = False
 
-        for device, is_running in self.is_record_running.items():
+        for device, is_running in self._is_record_running.items():
             if is_running:
                 energy_recorded = True
-                self.is_record_running[device] = False
+                self._is_record_running[device] = False
                 self._measure[device][1] = self.energy(device)
 
         if not energy_recorded:
             raise PyRAPLNoEnergyConsumptionRecordStartedException()
 
+    def _compute_recorded_energy(self, device):
+
+        recorded_energy = self._measure[device][1] - self._measure[device][0]
+        self._measure[device][0] = None
+        self._measure[device][1] = None
+        return recorded_energy
 
     def recorded_energy(self, *devices):
         """
         get the latest energy consumption recorded by PyRAPL for the given device
         :return: energy (in mJ) consumed between the last record() and stop() function call
         :raise PyRAPLNoEnergyConsumptionRecordedException: if no energy consumption was recorded
-        :raise TypeError: if device is not a Device parameter
+        :raise TypeError: if device is not a Device instance
         """
-        if len(devices) == 0 : 
-            l={}
-            for dev in self._measure.keys():
+        measures = {}
+        if devices:
+            for device in devices:
+                if not isinstance(device, Device):
+                    raise TypeError()
+
+                if self._measure[device][0] is None or self._measure[device][1] is None:
+                    raise PyRAPLNoEnergyConsumptionRecordedException
+
+                measures[device] = self._compute_recorded_energy(device)
+
+            return measures
+        else:
+            for device in self._measure:
                 # print("dev {}, dev[0] {} ,dev[1] {}".format(dev,self.measure[dev][0],self.measure[dev][1]) )
-                if self._measure[dev][0] and self._measure[dev][1]:
-                    l[dev] = self._measure[dev][1] - self._measure[dev][0]
-                    self._measure[dev][0] = None
-                    self._measure[dev][1] = None
-                    
-            if len(l) ==0 :
-                raise PyRAPLNoEnergyConsumptionRecordedException
-            return l
-        measures={}
-
-        for device in devices : 
-            if not isinstance(device, Device):
-                raise TypeError()
-
-            if self._measure[device][0] is None or self._measure[device][1] is None:
+                if self._measure[device][0] and self._measure[device][1]:
+                    measures[device] = self._compute_recorded_energy(device)
+            if measures:
+                return measures
+            else:
                 raise PyRAPLNoEnergyConsumptionRecordedException
 
-            measures[device] = self._measure[device][1] - self._measure[device][0]
-            self._measure[device][0] = None
-            self._measure[device][1] = None
 
-        return measures
+class Measure:
+    def __init__(self, function_name, data):
+        self.function_name = function_name
+        self.data = data
 
-# @staticmethod
-def measure(_func=None,*,devices=[Device.TIME,Device.PKG, Device.DRAM],handler=None):
-    """ a decorator to measure the energy consumption of a function recorded by PyRAPL  
-    :param [Device] devices: the list of events to monitor by pyrapl
+
+def measure(_func=None, *, devices=None, handler=None):
+    """ a decorator to measure the energy consumption of a function recorded by PyRAPL
+    :param [Device] devices: the list of devices to monitor by pyrapl
     :param function(measure) handler: traitement of the results recorded from pyrapl
     """
 
-    def default_handler(measures): 
+    def default_handler(measures):
         # print("default handler")
-        func = sys._getframe(1).f_locals['func'].__name__
-        print(f"measures got from the function {func } :")
-        for mes in measures.keys() : 
-            print(f"{mes } : {measures[mes]:.4}")
+        print(f"measures got from the function {measures.function_name } :")
+        for mes, val in measures.data.items():
+            print(f"{mes } : {val:.4}")
 
     def decorator_measure_energy(func):
         @functools.wraps(func)
-        def wrapper_measure(*args,**kwargs):
-            sensor=PyRAPL()
-            sensor.record(devices)
-            val=func(*args,**kwargs)
+        def wrapper_measure(*args, **kwargs):
+            sensor = PyRAPL()
+            sensor.record(*devices)
+            t1 = time.perf_counter()
+            val = func(*args, **kwargs)
+            t2 = time.perf_counter()
             sensor.stop()
-            handle(sensor.recorded_energy(*devices))
+
+            data = {
+                device._name_: mes for device, mes in sensor.recorded_energy(*devices).items()
+            }
+            data['TIME'] = t2 - t1
+
+            handle(Measure(func.__name__, data))
             return val
-        return wrapper_measure 
+        return wrapper_measure
 
-    # measure.sensor=PyRAPL() # to make an instance only one time 
-    if type(devices) != list : 
-        devices=[devices]
+    # measure.sensor=PyRAPL() # to make an instance only one time
+    if not isinstance(devices, list):
+        devices = [devices] if devices else []
 
-    handle= default_handler if handler is None else handler 
+    handle = default_handler if handler is None else handler
 
-    if _func is None: # to ensure the working system when you call it with parameters or without parameters 
+    if _func is None:
+        # to ensure the working system when you call it with parameters or without parameters
         return decorator_measure_energy
     else:
         return decorator_measure_energy(_func)

@@ -21,6 +21,10 @@ def fun2(n):
     sleep(2*n)
 
 
+@pyRAPL.measure(devices=[pyRAPL.Device.PKG, pyRAPL.Device.DRAM])
+def fun3(n):
+    sleep(2*n)
+
 
 def main1():
     n = int(argv[1]) if len(argv) >1 else 5 
@@ -47,7 +51,7 @@ def main2():
     # testi(n)
     # fun2(n)
     # testi(n)
-    fun2(n)
+    fun3(n)
 
 if __name__=="__main__":
     main2()
