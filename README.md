@@ -12,3 +12,8 @@ To measure the energy consumed during the execution of the function `fun()` run 
 	sensor.stop()
 	energy_pkg = sensor.recorded_energy(pyRAPL.Device.PKG)
     energy_dram = sensor.recorded_energy(pyRAPL.Device.DRAM)
+
+
+# TODO 
+- [ ] add decorator 
+- [X] add time measure 
