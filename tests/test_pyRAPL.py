@@ -4,7 +4,7 @@ import psutil
 
 from mock import patch, Mock
 
-from pyRAPL import PyRAPL, Device, PyRAPLCantRecordEnergyConsumption
+from pyRAPL import PyRAPL, Device, measure, Measure, PyRAPLCantRecordEnergyConsumption
 from pyRAPL import PyRAPLNoEnergyConsumptionRecordedException, PyRAPLNoEnergyConsumptionRecordStartedException
 
 psutil.Process = Mock()
@@ -49,7 +49,7 @@ def rapl_fs_with_dram(rapl_fs_with_core):
     """
     rapl_fs_with_core.create_file('/sys/class/powercap/intel-rapl/intel-rapl:0/intel-rapl:0:1/name', contents='dram\n')
     rapl_fs_with_core.create_file('/sys/class/powercap/intel-rapl/intel-rapl:0/intel-rapl:0:1/energy_uj',
-                                  contents='12345\n')
+                                  contents='54321\n')
     return rapl_fs_with_core
 
 
@@ -85,7 +85,7 @@ def test_uniq_init_executed_once(mock1, mock2):
 
 def test_get_siblings_cpu_simple_list(fs):
     """
-    create a /sys/devices/system/cpu/cpu0/topology/core_siblings_list file that contains the following value : 
+    create a /sys/devices/system/cpu/cpu0/topology/core_siblings_list file that contains the following value :
     1,2,3,20
     use the PyRAPL._get_siblings_cpu to retrieve sibling cpu of cpu0
 
@@ -98,7 +98,7 @@ def test_get_siblings_cpu_simple_list(fs):
 
 def test_get_siblings_cpu_interval_id(fs):
     """
-    create a /sys/devices/system/cpu/cpu0/topology/core_siblings_list file that contains the following value : 
+    create a /sys/devices/system/cpu/cpu0/topology/core_siblings_list file that contains the following value :
     1-3
     use the PyRAPL._get_siblings_cpu to retrieve sibling cpu of cpu0
 
@@ -111,7 +111,7 @@ def test_get_siblings_cpu_interval_id(fs):
 
 def test_get_package_id(fs):
     """
-    create a /sys/devices/system/cpu/cpu0/topology/physical_package_id file that contains the following value : 
+    create a /sys/devices/system/cpu/cpu0/topology/physical_package_id file that contains the following value :
     9
     use the PyRAPL._get_package_id to retrieve the package id of cpu0
 
@@ -252,6 +252,7 @@ def test_start_record_energy_pkg_without_rapl(base_fs, mocked_pyRAPL):
         mocked_pyRAPL.record(Device.PKG)
 
 
+
 def test_record_bad_type_device(rapl_fs, mocked_pyRAPL):
     """
     call the PyRAPL.record function with non Device parameter
@@ -297,6 +298,40 @@ def test_start_record_energy_pkg_and_dram(rapl_fs_with_dram, mocked_pyRAPL):
     assert mocked_pyRAPL._measure[Device.PKG][0] is not None
     assert mocked_pyRAPL._measure[Device.DRAM][0] is not None
 
+def test_start_record_energy_all(rapl_fs_with_dram, mocked_pyRAPL):
+    """
+    try to start all energy consumtpion recording 
+
+    create an instance of PyRAPL with the file system base_fs and run the record function
+
+    Test if:
+      - before runing the function the _measure[Device.PKG][0] and _measure[Device.DRAM][0] attribute is None
+      - the _measure[Device.PKG][0] and _measure[Device.DRAM][0] attribute is not None
+    """
+    assert mocked_pyRAPL._measure[Device.PKG][0] is None
+    assert mocked_pyRAPL._measure[Device.DRAM][0] is None
+    mocked_pyRAPL.record()
+    assert mocked_pyRAPL._measure[Device.PKG][0] is not None
+    assert mocked_pyRAPL._measure[Device.DRAM][0] is not None
+
+
+def test_start_record_energy_all(rapl_fs, mocked_pyRAPL):
+    """
+    try to start all energy consumtpion recording in a file system without dram
+
+    create an instance of PyRAPL with the file system base_fs and run the record function
+
+    Test if:
+      - before runing the function the _measure[Device.PKG][0] and _measure[Device.DRAM][0] attribute is None
+      - the _measure[Device.PKG][0] attribute is not None
+      - the _measure[Device.PKG][0] attribute is None
+    """
+    assert mocked_pyRAPL._measure[Device.PKG][0] is None
+    assert mocked_pyRAPL._measure[Device.DRAM][0] is None
+    mocked_pyRAPL.record()
+    assert mocked_pyRAPL._measure[Device.PKG][0] is not None
+    assert mocked_pyRAPL._measure[Device.DRAM][0] is None
+
 ##################################
 # STOP RECORDING PACKAGE ENERGY  #
 ##################################
@@ -333,9 +368,9 @@ def test_stop_record_energy_pkg(rapl_fs, mocked_pyRAPL):
     assert mocked_pyRAPL._measure[Device.PKG][1] is not None
     assert mocked_pyRAPL._is_record_running[Device.PKG] is False
 
-#################################
+################################
 # GET RECORDED PACKAGE ENERGY  #
-#################################
+################################
 def test_get_record_pkg_result_without_measure(rapl_fs, mocked_pyRAPL):
     """
     try to get cpu package energy consumtpion without starting recording
@@ -360,17 +395,29 @@ def test_get_recorded_energy_bad_type_device(rapl_fs, mocked_pyRAPL):
         mocked_pyRAPL.recorded_energy(5)
 
 
+def test_get_recorded_energy_bad_type_device_list(rapl_fs, mocked_pyRAPL):
+    """
+    call the PyRAPL.recorded_energy function with a non Device argument and a Device argument
+
+    Test if:
+      - A TypeError is raise
+    """
+    mocked_pyRAPL.record(Device.PKG)
+    mocked_pyRAPL.stop()
+    with pytest.raises(TypeError):
+        mocked_pyRAPL.recorded_energy(Device.PKG, 5)
+
+
 def test_get_record_energy_pkg(rapl_fs, mocked_pyRAPL):
     """
     try to get cpu package energy consumtpion recording result
 
-    create an instance of PyRAPL with the file system base_fs and run the start_record_energy_pkg and the
-    stop_record_energy_pkg functions after that, run the get_record_pkg_result function
+    create an instance of PyRAPL with the file system base_fs and run the record function and the
+    stop functions after that, run the recorded_energy function with Device.PKG parameter
 
     Test if:
-      - the returned value is an integer
-      - the returned value is equls to th difference between the _measure[Device.PKG][0] attribute and the
-        _measure[Device.PKG][1] attribute
+      - the returned value is a dictionary
+      - the dictionary contains the recorded energy consumption measure for package
     """
     mocked_pyRAPL.record(Device.PKG)
     mocked_pyRAPL.stop()
@@ -379,3 +426,251 @@ def test_get_record_energy_pkg(rapl_fs, mocked_pyRAPL):
     assert isinstance(val, dict)
     assert Device.PKG in val
     assert val[Device.PKG] == correct_value
+
+
+def test_get_record_energy_all(rapl_fs_with_dram, mocked_pyRAPL):
+    """
+    try to get all the recorded energy consumtpion recording result
+
+    create an instance of PyRAPL with the file system base_fs and run the record function and the
+    stop functions after that, run the recorded_energy function
+
+    Test if:
+      - the returned value is a dictionary
+      - the dictionary contains the recorded energy consumption measure for package and dram
+    """
+    mocked_pyRAPL.record()
+    mocked_pyRAPL.stop()
+    correct_value = {
+        Device.PKG: mocked_pyRAPL._measure[Device.PKG][1] - mocked_pyRAPL._measure[Device.PKG][0],
+        Device.DRAM: mocked_pyRAPL._measure[Device.DRAM][1] - mocked_pyRAPL._measure[Device.DRAM][0]
+    }
+    result = mocked_pyRAPL.recorded_energy()
+    assert isinstance(result, dict)
+    for device in [Device.PKG, Device.DRAM]:
+        assert device in result
+        assert result[Device.PKG] == correct_value[device]
+
+
+def test_get_record_energy_dram_pkg(rapl_fs_with_dram, mocked_pyRAPL):
+    """
+    try to get dram and package energy consumtpion recording result
+
+    create an instance of PyRAPL with the file system base_fs and run the record function and the
+    stop functions after that, run the recorded_energy function
+
+    Test if:
+      - the returned value is a dictionary
+      - the dictionary contains the recorded energy consumption measure for package and dram
+    """
+    mocked_pyRAPL.record(Device.PKG, Device.DRAM)
+    mocked_pyRAPL.stop()
+    correct_value = {
+        Device.PKG: mocked_pyRAPL._measure[Device.PKG][1] - mocked_pyRAPL._measure[Device.PKG][0],
+        Device.DRAM: mocked_pyRAPL._measure[Device.DRAM][1] - mocked_pyRAPL._measure[Device.DRAM][0]
+    }
+    result = mocked_pyRAPL.recorded_energy(Device.PKG, Device.DRAM)
+    assert isinstance(result, dict)
+    for device in [Device.PKG, Device.DRAM]:
+        assert device in result
+        assert result[Device.PKG] == correct_value[device]
+
+
+##############
+# DECORATEUR #
+##############
+def test_function_return_value(rapl_fs):
+    """
+    test if the decorated function return a value
+    """
+    @measure
+    def fun():
+        return 1
+
+    assert fun() == 1
+
+def test_use_parameter(rapl_fs):
+    """
+    decorate a function that take a parameter and return it
+
+    Test if:
+      - the given parameter are returned by the decorated function
+    """
+    @measure
+    def fun(a):
+        return a
+
+    arg = 3
+    assert fun(arg) == arg
+
+
+def test_use_two_parameter(rapl_fs):
+    """
+    decorate a function that take two parameter and return them
+
+    Test if:
+      - the given parameters are returned by the decorated function
+    """
+    @measure
+    def fun(a, b):
+        return (a, b)
+
+    arg1 = 3
+    arg2 = 7
+    assert fun(arg1, arg2) == (arg1, arg2)
+
+
+def test_use_positional_parameter(rapl_fs):
+    """
+    decorate a function that take positional parameter and return them
+
+    Test if:
+      - the given parameters are returned by the decorated function
+    """
+    @measure
+    def fun(*a):
+        return a
+
+    arg1 = 3
+    arg2 = 7
+    assert fun(arg1, arg2) == (arg1, arg2)
+
+
+def test_use_mutable_parameter(rapl_fs):
+    """
+    decorate a function that take mutable parameter and modify it
+
+    Test if:
+      - the given parameter is changed
+    """
+    class Mutable:
+        def __init__(self, val):
+            self.val = val
+
+    @measure
+    def fun(mut):
+        mut.val = 0
+
+    mut = Mutable(5)
+    assert mut.val == 5
+    fun(mut)
+    assert mut.val == 0
+
+
+def test_param_decorator_monitor_pkg(rapl_fs_with_dram, mocked_pyRAPL):
+    """
+    decorate a function to monitor package power consumption
+
+    Test if:
+      - the result only contains package power consumption the ellipsed time and the functio name
+    """
+    class Res:
+        def __init__(self):
+            self.res = None
+
+    result = Res()
+    def handler(res):
+        result.res = res
+
+    @measure(devices=Device.PKG, handler=handler)
+    def fun():
+        return None
+
+    fun()
+    assert len(result.res.data) == 2
+    assert 'PKG' in result.res.data
+    assert 'TIME' in result.res.data
+    assert result.res.function_name == fun.__name__
+
+
+def test_param_decorator_monitor_pkg_dram(rapl_fs_with_dram, mocked_pyRAPL):
+    """
+    decorate a function to monitor package and dram power consumption
+
+    Test if:
+      - the result only contains package and dram power consumption, the ellipsed time and the functio name
+    """
+    class Res:
+        def __init__(self):
+            self.res = None
+
+    result = Res()
+    def handler(res):
+        result.res = res
+
+    @measure(devices=[Device.PKG, Device.DRAM], handler=handler)
+    def fun():
+        return None
+
+    fun()
+    assert len(result.res.data) == 3
+    assert 'PKG' in result.res.data
+    assert 'DRAM' in result.res.data
+    assert 'TIME' in result.res.data
+    assert result.res.function_name == fun.__name__
+
+
+def test_param_decorator_monitor_all(rapl_fs_with_dram, mocked_pyRAPL):
+    """
+    decorate a function to monitor all power consumption
+
+    Test if:
+      - the result only contains package and dram power consumption, the ellipsed time and the functio name
+    """
+    class Res:
+        def __init__(self):
+            self.res = None
+
+    result = Res()
+    def handler(res):
+        result.res = res
+
+    @measure(handler=handler)
+    def fun():
+        return None
+
+    fun()
+    assert len(result.res.data) == 3
+    assert 'PKG' in result.res.data
+    assert 'DRAM' in result.res.data
+    assert 'TIME' in result.res.data
+    assert result.res.function_name == fun.__name__
+
+
+def test_handler_call(rapl_fs, mocked_pyRAPL):
+    """
+    decorate a function an use a mocked handler to handle the measures
+
+    Test if:
+      - The mocked handle function is called with a Measure parameter
+    """
+    mocked_handler = Mock()
+    @measure(handler=mocked_handler)
+    def fun():
+        return None
+
+    assert mocked_handler.call_count == 0
+
+    fun()
+
+    assert mocked_handler.call_count == 1
+    assert isinstance(mocked_handler.call_args[0][0], Measure)
+
+
+@patch('builtins.print')
+def test_handler_call(mocked_print, rapl_fs, mocked_pyRAPL):
+    """
+    decorate a function an use a the default handler
+
+    Test if:
+      - the print function was called
+    """
+    @measure()
+    def fun():
+        return None
+
+    assert mocked_print.call_count == 0
+
+    fun()
+
+    assert mocked_print.call_count == 3

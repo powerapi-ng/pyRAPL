@@ -91,7 +91,6 @@ class PyRAPL:
         }
         self._package_id = None
         self._siblings_cpu = None
-
         if self._already_init is False:
             self._already_init = True
             self._uniq_init()
