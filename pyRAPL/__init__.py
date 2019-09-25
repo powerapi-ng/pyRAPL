@@ -25,4 +25,4 @@
 from pyRAPL.pyRAPL import PyRAPL, Device, PyRAPLException, PyRAPLNoEnergyConsumptionRecordedException
 from pyRAPL.pyRAPL import PyRAPLNoEnergyConsumptionRecordStartedException, PyRAPLCantRecordEnergyConsumption
 
-__version__ = "0.0.2"
+__version__ = "0.1.0"
