@@ -280,7 +280,9 @@ class PyRAPL:
 # @staticmethod
 def measure(_func=None,*,devices=[Device.TIME,Device.PKG, Device.DRAM],handler=None):
     """ a decorator to measure the energy consumption of a function recorded by PyRAPL  
-    :return (function return , [measure1, measure2 ..etc]) """
+    :param [Device] devices: the list of events to monitor by pyrapl
+    :param function(measure) handler: traitement of the results recorded from pyrapl
+    """
     def default_handler(measures): 
         print("default handler")
         # print(f"measures got from the function {func.__name__ }")
