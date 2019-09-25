@@ -73,6 +73,7 @@ class PyRAPL:
     already_init = False
 
     def __init__(self):
+
         self.is_record_running = {
             Device.TIME : False,
             Device.PKG: False,
@@ -277,22 +278,31 @@ class PyRAPL:
         return measures
 
 # @staticmethod
-def measure(_func=None,*,devices=[Device.TIME,Device.PKG, Device.DRAM]):
+def measure(_func=None,*,devices=[Device.TIME,Device.PKG, Device.DRAM],handler=None):
     """ a decorator to measure the energy consumption of a function recorded by PyRAPL  
     :return (function return , [measure1, measure2 ..etc]) """
-    
+    def default_handler(measures): 
+        print("default handler")
+        # print(f"measures got from the function {func.__name__ }")
+        for mes in measures.keys() : 
+            print(f"{mes } : {measures[mes]}")
+
     def decorator_measure_energy(func):
         @functools.wraps(func)
         def wrapper_measure(*args,**kwargs):
-            # measure.sensor=PyRAPL()
-            measure.sensor.record(devices)
+            sensor=PyRAPL()
+            sensor.record(devices)
             val=func(*args,**kwargs)
-            measure.sensor.stop()
-            return val,measure.sensor.recorded_energy()
+            sensor.stop()
+            handle(sensor.recorded_energy(*devices))
+            return val
         return wrapper_measure 
-    measure.sensor=PyRAPL() # to make an instance only one time 
+
+    # measure.sensor=PyRAPL() # to make an instance only one time 
     if type(devices) != list : 
         devices=[devices]
+
+    handle= default_handler if handler is None else handler 
 
     if _func is None: # to ensure the working system when you call it with parameters or without parameters 
         return decorator_measure_energy

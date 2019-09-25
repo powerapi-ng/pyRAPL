@@ -6,10 +6,15 @@ from sys import argv
 
 
 
+def myhandler(measures):
+    print("myhandler")
+    print(measures)
 
-@pyRAPL.measure
-def fun(n):
+
+@pyRAPL.measure(handler=myhandler)
+def testi(n):
     sleep(n)
+    return n 
 
 @pyRAPL.measure(devices=pyRAPL.Device.TIME)
 def fun2(n):
@@ -39,14 +44,10 @@ def main1():
 
 def main2():
     n = int(argv[1]) if len(argv) >1 else 5 
+    testi(n)
     fun2(n)
-    print("fin f2")
-    fun(n)
-    print("fin f1")
-    _,measures=fun(n)
-
-    print(_)
-    print(measures[pyRAPL.Device.DRAM])
+    testi(n)
+    fun2(n)
 
 if __name__=="__main__":
     main2()
