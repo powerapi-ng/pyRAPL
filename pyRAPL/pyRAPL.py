@@ -190,7 +190,7 @@ class PyRAPL:
         """
         return the amount of consumed energy by the device given in parameter since last CPU reset
         :param Device device: the device to get the power consumption
-        :return int: the amount of consumed energy of the device since last CPU reset in mJ
+        :return float: the amount of consumed energy of the device since last CPU reset in J
         :raise PyRAPLCantRecordEnergyConsumption: if no energy consumtion metric is available for the given device
         :raise TypeError: if device is not a Device instance
         """
@@ -203,7 +203,7 @@ class PyRAPL:
 
         api_file = self._sys_api[device]
         api_file.seek(0, 0)
-        return int(api_file.readline())
+        return int(api_file.readline())/1000000
 
     def _begin_record(self, device):
         energy = self.energy(device)
@@ -243,7 +243,7 @@ class PyRAPL:
 
     def _compute_recorded_energy(self, device):
 
-        recorded_energy =  (self._measure[device][1] - self._measure[device][0])/1000000
+        recorded_energy =  (self._measure[device][1] - self._measure[device][0])
         # print("yolo")
         self._measure[device][0] = None
         self._measure[device][1] = None
@@ -252,7 +252,7 @@ class PyRAPL:
     def recorded_energy(self, *devices):
         """
         get the latest energy consumption recorded by PyRAPL for the given device
-        :return: energy (in mJ) consumed between the last record() and stop() function call
+        :return: energy (in J) consumed between the last record() and stop() function call
         :raise PyRAPLNoEnergyConsumptionRecordedException: if no energy consumption was recorded
         :raise TypeError: if device is not a Device instance
         """
