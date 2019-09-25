@@ -25,7 +25,6 @@ import os
 import logging
 import time
 import functools
-from math import ldexp
 
 from enum import Enum
 
@@ -204,7 +203,7 @@ class PyRAPL:
 
         api_file = self._sys_api[device]
         api_file.seek(0, 0)
-        return ldexp(int(api_file.readline()), -32)
+        return int(api_file.readline())
 
     def _begin_record(self, device):
         energy = self.energy(device)
@@ -244,7 +243,8 @@ class PyRAPL:
 
     def _compute_recorded_energy(self, device):
 
-        recorded_energy = self._measure[device][1] - self._measure[device][0]
+        recorded_energy =  (self._measure[device][1] - self._measure[device][0])/1000000
+        # print("yolo")
         self._measure[device][0] = None
         self._measure[device][1] = None
         return recorded_energy
