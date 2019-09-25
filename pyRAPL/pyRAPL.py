@@ -26,6 +26,8 @@ import logging
 from math import ldexp
 import time 
 import functools
+import sys 
+
 
 try:
     import psutil
@@ -283,11 +285,13 @@ def measure(_func=None,*,devices=[Device.TIME,Device.PKG, Device.DRAM],handler=N
     :param [Device] devices: the list of events to monitor by pyrapl
     :param function(measure) handler: traitement of the results recorded from pyrapl
     """
+
     def default_handler(measures): 
-        print("default handler")
-        # print(f"measures got from the function {func.__name__ }")
+        # print("default handler")
+        func = sys._getframe(1).f_locals['func'].__name__
+        print(f"measures got from the function {func } :")
         for mes in measures.keys() : 
-            print(f"{mes } : {measures[mes]}")
+            print(f"{mes } : {measures[mes]:.4}")
 
     def decorator_measure_energy(func):
         @functools.wraps(func)
