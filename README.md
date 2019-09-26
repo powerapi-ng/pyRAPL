@@ -15,6 +15,10 @@ pyRAPL can measure the power consumption of the following devices :
 - CPU socket package
 - DRAM (only on server CPU)
 
+# Installation
+
+You can install pyRAPL with pip : `pip install pyRAPL`
+
 # Basic usage
 
 Here is some basic usage of pyRAPL. Please understand that the measured power
