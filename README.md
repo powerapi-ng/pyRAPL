@@ -12,8 +12,8 @@ global power consumption of a machine. This technology is only available on
 Intel CPU with Sandy Bridge architecture or higher.
 
 pyRAPL can measure the power consumption of the following devices :
-- CPU socket package
-- DRAM (only on server CPU)
+ - pyRAPL.Device.PKG : CPU socket package 
+ - pyRAPL.Device.DRAM : DRAM (only on server CPU)
 
 # Installation
 
@@ -21,20 +21,29 @@ You can install pyRAPL with pip : `pip install pyRAPL`
 
 # Basic usage
 
-Here is some basic usage of pyRAPL. Please understand that the measured power
-consumption is not only the power consumption of the piece of code you are
-measuring. Its the global power consumption of all the process running on your
-machine. Including the operating system and other application running. 
+Here is some basic usage of pyRAPL. Please understand that the measured energy
+consumption is not only the energy consumption of the piece of code you are
+measuring. Its the **global energy consumption** of all the process running on your machine. Including the operating system and other running applications.
 
-If you use pyRAPL for research about software power consumption, please run your
-experiments on a machine that only run the code you want to measure the power
-consumption (no graphical interface, background runing task ...). This will give
-you a closest measure to the real power consumption of your piece of code.
+If you are using **pyRAPL** for research about software energy consumption, please run your experiments on a machine where **only** the code you want to measure the energy consumption is running  (no extra apllications such as graphical interface, background runing task ...).
+This will give
+you the closest measure to the real energy consumption of your piece of code.
 
 ## Decorate a function to measure its power consumption
 
 To measure the energy consumed by the machine during the execution of the
 function `fun()` run the following code :
+
+	import pyRAPL
+
+	@pyRAPL.measure
+	def fun():
+		# Some stuff ...
+
+	fun()
+
+## Customise the decorator by adding a handler  or specifying which devices you want to monitor 
+
 
 	import pyRAPL
 
@@ -65,4 +74,4 @@ piece of code, run the following code :
 
 	data = sensor.recorded_energy()
 	print('socket power consumption (in J) : ' + str(data[pyRAPL.Device.PKG]))
-	print('dram power consumption (in J) : ' + str(data[pyRAPL.Device.PKG]))
+	print('dram power consumption (in J) : ' + str(data[pyRAPL.Device.DRAM]))
