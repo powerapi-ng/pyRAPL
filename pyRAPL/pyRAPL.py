@@ -1,19 +1,15 @@
 # MIT License
-
-# Copyright (c) 2018, INRIA
-# Copyright (c) 2018, University of Lille
+# Copyright (c) 2019, INRIA
+# Copyright (c) 2019, University of Lille
 # All rights reserved.
-
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,29 +36,6 @@ class Device(Enum):
     GPU = 3
 
 
-class PyRAPLException(Exception):
-    """Parent class of all PyRAPL exception
-    """
-
-
-class PyRAPLNoEnergyConsumptionRecordedException(PyRAPLException):
-    """Exception raised when a function recorded_energy() is executed without stoping consumption recording before
-    """
-
-
-class PyRAPLNoEnergyConsumptionRecordStartedException(PyRAPLException):
-    """Exception raised when a function stop() is executed without starting consumption recording before"""
-
-
-class PyRAPLCantRecordEnergyConsumption(PyRAPLException):
-    """Exception raised when starting recording power consumption for a device but no power consumption metric is
-    available for this device
-    """
-    def __init__(self, device):
-        PyRAPLException.__init__(self)
-        self.device = device
-
-
 class PyRAPL:
     """
     singleton that force the execution of the running process on a unique package and retrieve package power consumption
@@ -76,7 +49,7 @@ class PyRAPL:
             cls._instance = object.__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, pin_process=False):
 
         self._is_record_running = {
             Device.PKG: False,
@@ -90,6 +63,8 @@ class PyRAPL:
         }
         self._package_id = None
         self._siblings_cpu = None
+        self.pin_process = pin_process
+
         if self._already_init is False:
             self._already_init = True
             self._uniq_init()
@@ -103,44 +78,15 @@ class PyRAPL:
             Device.DRAM: None,
             Device.GPU: None
         }
-        self._siblings_cpu = PyRAPL._get_siblings_cpu()
-        self._package_id = PyRAPL._get_package_id()
-        PyRAPL._force_cpu_execution_on(self._siblings_cpu)
+
+        if self.pin_process:
+            self._siblings_cpu = PyRAPL._get_siblings_cpu()
+            self._package_id = PyRAPL._get_package_id()
+            PyRAPL._force_cpu_execution_on(self._siblings_cpu)
+
         self._open_rapl_files(self._package_id)
 
-    @staticmethod
-    def _get_siblings_cpu():
-        """
-        return the CPUs that are on the same physical package that the CPU0
-        :return list:
-        """
-        f = open('/sys/devices/system/cpu/cpu0/topology/core_siblings_list')
-        s = f.readline()
 
-        if '-' in s:
-            [first, last] = list(map(int, s.split('-')))
-            return list(range(first, last + 1))
-        else:
-            return list(map(int, s.split(',')))
-
-    @staticmethod
-    def _force_cpu_execution_on(cpu_list):
-        """
-        force the execution of the current process on the CPU given as parameter
-        :param cpu_list list: list of CPU id (int) where the current process can be executed
-        """
-        current_process = psutil.Process()
-        current_process.cpu_affinity(cpu_list)
-
-    @staticmethod
-    def _get_package_id():
-        """
-        return physical package id of the CPU0
-        :return int:
-        """
-        f = open('/sys/devices/system/cpu/cpu0/topology/physical_package_id')
-        s = f.readline()
-        return int(s)
 
     def _open_rapl_files(self, package_id):
         """
@@ -292,7 +238,6 @@ def measure(_func=None, *, devices=None, handler=None):
     """
 
     def default_handler(measures):
-        # print("default handler")
         print(f"measures got from the function {measures.function_name } :")
         for mes, val in measures.data.items():
             print(f"{mes } : {val:.4}")

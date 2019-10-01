@@ -1,6 +1,6 @@
 # MIT License
-# Copyright (c) 2018, INRIA
-# Copyright (c) 2018, University of Lille
+# Copyright (c) 2019, INRIA
+# Copyright (c) 2019, University of Lille
 # All rights reserved.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,10 @@ class Sample:
         #: function execution time
         self.duration = None
         #: power consumption data
-        #: python array containing the power consumption of each measured device for each monitored socket
+        #: python float array containing the power consumption (in J) of each measured device for each monitored socket
         #: [0 + 2*I] -> CPU package power consumption (socket I)
         #: [1 + 2*I] -> DRAM power consumption (socket I)
-        self.data = array.array('I', [-1] * sensor.number_of_socket)
+        self.data = array.array('f', [-1] * sensor.number_of_socket)
 
         self._measure_launched = False
 
