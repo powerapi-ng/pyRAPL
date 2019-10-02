@@ -168,6 +168,23 @@ def test_init_two_files_two_socket(fs_two_socket, device_api_param):
       - the attribute DeviceAPI._sys_files is a list of length 2
       - the attribute DeviceAPI._sys_files contains two files (test the file's name)
     """
+    device_api = device_api_param.device_class(socket_ids=[0, 1])
+
+    assert isinstance(device_api._sys_files, list)
+    assert len(device_api._sys_files) == 2
+
+    assert device_api._sys_files[0].name == device_api_param.socket0_filename
+    assert device_api._sys_files[1].name == device_api_param.socket1_filename
+
+    
+def test_init_two_files_all_socket(fs_two_socket, device_api_param):
+    """
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0 and 1
+    The filesystem contains a rapl file for the socket 0 and 1
+    Test if:
+      - the attribute DeviceAPI._sys_files is a list of length 2
+      - the attribute DeviceAPI._sys_files contains two files (test the file's name)
+    """
     device_api = device_api_param.device_class()
 
     assert isinstance(device_api._sys_files, list)
@@ -264,6 +281,28 @@ def test_energy_two_files_socket_0_1(device_api_param, fs_two_socket):
       - the first value of the tuple is the power consumption of the corresponding device on socket 0
       - the second value of the tuple is the power consumption of the corresponding device on socket 1
     """
+    device_api = device_api_param.device_class(socket_ids=[0, 1])
+
+    energy = device_api.energy()
+    assert isinstance(energy, tuple)
+    assert len(energy) == 2
+    for val in energy:
+        assert isinstance(val, float)
+
+    assert energy[0] == device_api_param.socket0_value / 1000000
+    assert energy[1] == device_api_param.socket1_value / 1000000
+
+
+def test_energy_two_files_socket_all(device_api_param, fs_two_socket):
+    """
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on all socket
+    use the energy function to get the power consumption
+    The filesystem contains a rapl file for the socket 0 and 1
+    Test if:
+      - the returned value is a tuple of length 2 containing float
+      - the first value of the tuple is the power consumption of the corresponding device on socket 0
+      - the second value of the tuple is the power consumption of the corresponding device on socket 1
+    """
     device_api = device_api_param.device_class()
 
     energy = device_api.energy()
@@ -286,7 +325,7 @@ def test_energy_two_files_socket_1_0(device_api_param, fs_two_socket):
       - the first value of the tuple is the power consumption of the corresponding device on socket 0
       - the second value of the tuple is the power consumption of the corresponding device on socket 1
     """
-    device_api = device_api_param.device_class(socket_ids=[0, 1])
+    device_api = device_api_param.device_class(socket_ids=[1, 0])
 
     energy = device_api.energy()
     assert isinstance(energy, tuple)
