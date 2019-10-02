@@ -19,9 +19,11 @@
 # SOFTWARE.
 
 import pytest
-import pyfakefs
 
 from pyRAPL import PkgAPI, DramAPI, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
+from utils import PKG_0_FILE_NAME, PKG_0_VALUE, PKG_1_FILE_NAME, PKG_1_VALUE
+from utils import DRAM_0_FILE_NAME, DRAM_0_VALUE, DRAM_1_FILE_NAME, DRAM_1_VALUE
+from utils import empty_fs, fs_one_socket, fs_two_socket, fs_one_socket_no_dram
 
 class DeviceParameters:
     def __init__(self, device_class, socket0_filename, socket0_value, socket1_filename, socket1_value):
@@ -32,23 +34,6 @@ class DeviceParameters:
         self.socket1_filename = socket1_filename
         self.socket1_value = socket1_value
 
-
-SOCKET_0_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:0'
-SOCKET_1_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:1'
-
-PKG_0_FILE_NAME = SOCKET_0_DIR_NAME + '/energy_uj'
-PKG_0_VALUE = 12345
-PKG_1_FILE_NAME = SOCKET_1_DIR_NAME + '/energy_uj'
-PKG_1_VALUE = 54321
-
-DRAM_0_DIR_NAME = SOCKET_0_DIR_NAME + '/intel-rapl:0:0'
-DRAM_1_DIR_NAME = SOCKET_1_DIR_NAME + '/intel-rapl:1:0'
-
-DRAM_0_FILE_NAME = DRAM_0_DIR_NAME + '/energy_uj'
-DRAM_0_VALUE = 6789
-DRAM_1_FILE_NAME = DRAM_1_DIR_NAME + '/energy_uj'
-DRAM_1_VALUE = 9876
-
 @pytest.fixture(params=[DeviceParameters(PkgAPI, PKG_0_FILE_NAME, PKG_0_VALUE, PKG_1_FILE_NAME, PKG_1_VALUE),
                         DeviceParameters(DramAPI, DRAM_0_FILE_NAME, DRAM_0_VALUE, DRAM_1_FILE_NAME, DRAM_1_VALUE)])
 def device_api_param(request):
@@ -57,40 +42,6 @@ def device_api_param(request):
     """
     print(request.param.device_class.__name__)
     return request.param
-
-
-@pytest.fixture
-def empty_fs(fs):
-    """
-    create an empty file system
-    """
-    return fs
-
-@pytest.fixture
-def fs_one_socket(fs):
-    """
-    create a file system containing energy metric for package and dram on one socket
-    """
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(DRAM_0_DIR_NAME + '/name', contents='dram\n')
-    fs.create_file(DRAM_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
-    return fs
-
-
-@pytest.fixture
-def fs_two_socket(fs_one_socket):
-    """
-    create a file system containing energy metric for package and dram on two socket
-    """
-    fs_one_socket.create_file(SOCKET_1_DIR_NAME + '/name', contents='package-1\n')
-    fs_one_socket.create_file(PKG_1_FILE_NAME, contents=str(PKG_1_VALUE) + '\n')
-
-    fs_one_socket.create_file(DRAM_1_DIR_NAME + '/name', contents='dram\n')
-    fs_one_socket.create_file(DRAM_1_FILE_NAME, contents=str(DRAM_1_VALUE) + '\n')
-    return fs_one_socket
-
 
 #############
 # INIT TEST #
@@ -193,20 +144,13 @@ def test_init_two_files_all_socket(fs_two_socket, device_api_param):
     assert device_api._sys_files[0].name == device_api_param.socket0_filename
     assert device_api._sys_files[1].name == device_api_param.socket1_filename
 
-def test_init_dram_api_without_dram_files(fs):
+def test_init_dram_api_without_dram_files(fs_one_socket_no_dram):
     """
     create a DramAPI instance to measure power consumption of device on socket 0
     The file system contains a rapl file for the socket 0 but no dram support
     Test if:
       - a PyRAPLCantInitDeviceAPI is raised
     """
-
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(SOCKET_0_DIR_NAME + '/intel-rapl:0:0' + '/name', contents='gpu\n')
-
-    fs.create_file(SOCKET_0_DIR_NAME + '/intel-rapl:0:1' + '/name', contents='sys\n')
     with pytest.raises(PyRAPLCantInitDeviceAPI):
         DramAPI()
 
