@@ -28,7 +28,7 @@ class DeviceAPI:
     API to read energy power consumption from sysfs
     """
 
-    def __init__(self, socket_ids: Optional[int] = None):
+    def __init__(self, socket_ids: Optional[List[int]] = None):
         """
         :param int socket_ids: if None, the API will get the power consumption of the whole machine otherwise, it will
                                get the power consumption of the device on the given socket package
