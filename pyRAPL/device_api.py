@@ -20,7 +20,7 @@
 import os
 from typing import Optional, Tuple, List
 
-from pyRAPL import PyRAPLCantInitDeviceAPI
+from pyRAPL import PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
 
 
 class DeviceAPI:
@@ -68,8 +68,16 @@ class DeviceAPI:
             rapl_id += 1
 
         # check if the required sockets were found
-        if self._socket_ids is not None and len(self._socket_ids) != len(result_list):
-            raise PyRAPLCantInitDeviceAPI()
+        if self._socket_ids is not None:
+            def socket_found(socket_id):
+                for socket_info in result_list:
+                    if socket_info[0] == socket_id:
+                        return True
+                return False
+            for socket_id in self._socket_ids:
+                if not socket_found(socket_id):
+                    raise PyRAPLBadSocketIdException(socket_id)
+
         # check if socket files were found
         if not result_list:
             raise PyRAPLCantInitDeviceAPI()
