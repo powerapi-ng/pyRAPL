@@ -85,6 +85,11 @@ class DeviceAPI:
                              the Nth value of the tuple correspond to the power consumption of the device on the Nth
                              socket
         """
+        result = ()
+        for device_file in self._sys_files:
+            device_file.seek(0, 0)
+            result += (int(device_file.readline()) / 1000000,)
+        return result
 
 
 class PkgAPI(DeviceAPI):
