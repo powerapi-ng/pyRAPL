@@ -125,7 +125,7 @@ def test_init_two_file_one_socket(fs_two_socket, device_api_param):
       - the attribute DeviceAPI._sys_files is a list of length 1
       - the attribute DeviceAPI._sys_files contains a file (test the file's name)
     """
-    device_api = device_api_param.device_class(package_ids=[0])
+    device_api = device_api_param.device_class(socket_ids=[0])
     assert isinstance(device_api._sys_files, list)
     assert len(device_api._sys_files) == 1
     assert device_api._sys_files[0].name == device_api_param.socket0_filename
@@ -139,7 +139,7 @@ def test_init_two_file_last_socket(fs_two_socket, device_api_param):
       - the attribute DeviceAPI._sys_files is a list of length 1
       - the attribute DeviceAPI._sys_files contains one files (test the file's name)
     """
-    device_api = device_api_param.device_class(package_ids=[1])
+    device_api = device_api_param.device_class(socket_ids=[1])
 
     assert isinstance(device_api._sys_files, list)
     assert len(device_api._sys_files) == 1
@@ -155,7 +155,7 @@ def test_init_one_file_two_socket(fs_one_socket, device_api_param):
       - a PyRAPLCantInitDeviceAPI is raised
     """
     with pytest.raises(PyRAPLCantInitDeviceAPI):
-        device_api_param.device_class(package_ids=[0, 1])
+        device_api_param.device_class(socket_ids=[0, 1])
 
 
 def test_init_two_file_two_socket(fs_two_socket, device_api_param):
@@ -190,3 +190,6 @@ def test_init_dram_api_without_dram_files(fs):
     fs.create_file(SOCKET_0_DIR_NAME + '/intel-rapl:0:1' + '/name', contents='sys\n')
     with pytest.raises(PyRAPLCantInitDeviceAPI):
         DramAPI()
+
+
+
