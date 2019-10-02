@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from pyRAPL.exception import PyRAPLException, PyRAPLCantInitDeviceAPI
+from pyRAPL.exception import PyRAPLException, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
 from pyRAPL.pyRAPL import PyRAPL, Device, Measure, measure
 from pyRAPL.device_api import DeviceAPI, PkgAPI, DramAPI
 

@@ -21,7 +21,7 @@
 import pytest
 import pyfakefs
 
-from pyRAPL import PkgAPI, DramAPI, PyRAPLCantInitDeviceAPI
+from pyRAPL import PkgAPI, DramAPI, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
 
 class DeviceParameters:
     def __init__(self, device_class, socket0_filename, socket0_value, socket1_filename, socket1_value):
@@ -154,9 +154,9 @@ def test_init_one_file_two_socket(fs_one_socket, device_api_param):
     create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0 and 1
     The filesystem contains a rapl file for the socket 0
     Test if:
-      - a PyRAPLCantInitDeviceAPI is raised
+      - a PyRAPLBadSocketIdException is raised
     """
-    with pytest.raises(PyRAPLCantInitDeviceAPI):
+    with pytest.raises(PyRAPLBadSocketIdException) as e_info:
         device_api_param.device_class(socket_ids=[0, 1])
 
 
