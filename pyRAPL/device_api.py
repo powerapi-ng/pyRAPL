@@ -28,15 +28,15 @@ class DeviceAPI:
     API to read energy power consumption from sysfs
     """
 
-    def __init__(self, package_ids: Optional[int] = None):
+    def __init__(self, socket_ids: Optional[int] = None):
         """
-        :param int package_ids: if None, the API will get the power consumption of the whole machine otherwise, it will
+        :param int socket_ids: if None, the API will get the power consumption of the whole machine otherwise, it will
                                get the power consumption of the device on the given socket package
         :raise PyRAPLCantInitDeviceAPI: the machine where is initialised the DeviceAPI have no rapl interface for the
                                         target device
         :raise PyRAPLBadSocketIdException: the machine where is initialised the DeviceAPI has no the requested socket
         """
-        self._package_ids = package_ids
+        self._socket_ids = socket_ids
         self._sys_files = self._open_rapl_files()
 
     def _open_rapl_files(self):
@@ -55,7 +55,7 @@ class DeviceAPI:
             f_name = open(dirname + '/name', 'r')
             package_id = int(f_name.readline()[:-1].split('-')[1])
 
-            if self._package_ids is not None and package_id not in self._package_ids:
+            if self._socket_ids is not None and package_id not in self._socket_ids:
                 pass
             else:
                 result.append((package_id, ) + directory_info)
@@ -68,7 +68,7 @@ class DeviceAPI:
             rapl_id += 1
 
         # check if the required sockets were found
-        if self._package_ids is not None and len(self._package_ids) != len(result_list):
+        if self._socket_ids is not None and len(self._socket_ids) != len(result_list):
             raise PyRAPLCantInitDeviceAPI()
         # check if socket files were found
         if not result_list:
@@ -89,8 +89,8 @@ class DeviceAPI:
 
 class PkgAPI(DeviceAPI):
 
-    def __init__(self, package_ids: Optional[int] = None):
-        DeviceAPI.__init__(self, package_ids)
+    def __init__(self, socket_ids: Optional[int] = None):
+        DeviceAPI.__init__(self, socket_ids)
 
     def _open_rapl_files(self):
         directory_name_list = self._get_socket_directory_names()
@@ -103,8 +103,8 @@ class PkgAPI(DeviceAPI):
 
 class DramAPI(DeviceAPI):
 
-    def __init__(self, package_ids: Optional[int] = None):
-        DeviceAPI.__init__(self, package_ids)
+    def __init__(self, socket_ids: Optional[int] = None):
+        DeviceAPI.__init__(self, socket_ids)
 
     def _open_rapl_files(self):
         directory_name_list = self._get_socket_directory_names()
