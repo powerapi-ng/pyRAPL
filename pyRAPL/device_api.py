@@ -18,9 +18,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import os
+import re
 from typing import Optional, Tuple, List
 
-from pyRAPL import PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
+from pyRAPL import Device, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
+
+def cpu_ids() -> List[int]:
+    """
+    return the cpu id of this machine
+    """
+    api_file = open('/sys/devices/system/cpu/present', 'r')
+
+    cpu_id_tmp = re.findall('\d+|-', api_file.readline().strip())
+    cpu_id_list = []
+    for i in range(len(cpu_id_tmp)):
+        if cpu_id_tmp[i] == '-':
+            for id in range(int(cpu_id_tmp[i-1]) + 1, int(cpu_id_tmp[i+1])):
+                cpu_id_list.append(int(id))
+        else:
+            cpu_id_list.append(int(cpu_id_tmp[i]))
+    return cpu_id_list
+
+
+def get_socket_ids() -> List[int]:
+    """
+    return cpu socket id present on the machine
+    """
+    socket_id_list = []
+    for cpu_id in cpu_ids():
+        api_file = open('/sys/devices/system/cpu/cpu' + str(cpu_id) + '/topology/physical_package_id')
+        socket_id_list.append(int(api_file.readline().strip()))
+    return list(set(socket_id_list))
 
 
 class DeviceAPI:
@@ -36,7 +64,17 @@ class DeviceAPI:
                                         target device
         :raise PyRAPLBadSocketIdException: the machine where is initialised the DeviceAPI has no the requested socket
         """
-        self._socket_ids = socket_ids
+        all_socket_id = get_socket_ids()
+        if socket_ids is None:
+            self._socket_ids = all_socket_id
+        else:
+            for socket_id in socket_ids:
+                if socket_id not in all_socket_id:
+                    raise PyRAPLBadSocketIdException(socket_id)
+            self._socket_ids = socket_ids
+
+        self._socket_ids.sort()
+
         self._sys_files = self._open_rapl_files()
 
     def _open_rapl_files(self):
@@ -59,7 +97,6 @@ class DeviceAPI:
                 pass
             else:
                 result.append((package_id, ) + directory_info)
-
         rapl_id = 0
         result_list = []
         while os.path.exists('/sys/class/powercap/intel-rapl/intel-rapl:' + str(rapl_id)):
@@ -67,23 +104,12 @@ class DeviceAPI:
             add_to_result((dirname, rapl_id), result_list)
             rapl_id += 1
 
-        # check if the required sockets were found
-        if self._socket_ids is not None:
-            def socket_found(socket_id):
-                for socket_info in result_list:
-                    if socket_info[0] == socket_id:
-                        return True
-                return False
-            for socket_id in self._socket_ids:
-                if not socket_found(socket_id):
-                    raise PyRAPLBadSocketIdException(socket_id)
-
-        # check if socket files were found
-        if not result_list:
+        if len(result_list) != len(self._socket_ids):
             raise PyRAPLCantInitDeviceAPI()
 
-        # sort the result list and remove unused informations
+        # sort the result list
         result_list.sort(key=lambda t: t[0])
+        # return info without socket ids
         return list(map(lambda t: (t[1], t[2]), result_list))
 
     def energy(self) -> Tuple[float, ...]:
@@ -93,11 +119,12 @@ class DeviceAPI:
                              the Nth value of the tuple correspond to the power consumption of the device on the Nth
                              socket
         """
-        result = ()
-        for device_file in self._sys_files:
+        result = [-1] * (self._socket_ids[-1] + 1)
+        for i in range(len(self._sys_files)):
+            device_file = self._sys_files[i]
             device_file.seek(0, 0)
-            result += (int(device_file.readline()) / 1000000,)
-        return result
+            result[self._socket_ids[i]] = int(device_file.readline()) / 1000000
+        return tuple(result)
 
 
 class PkgAPI(DeviceAPI):
@@ -138,3 +165,19 @@ class DramAPI(DeviceAPI):
             rapl_files.append(get_dram_file(socket_directory_name, rapl_socket_id))
 
         return rapl_files
+
+class DeviceAPIFactory:
+    """
+    Factory Returning DeviceAPI
+    """
+    @staticmethod
+    def create_device_api(device: Device, socket_ids: Optional[int]) -> DeviceAPI:
+        """
+        :param device: the device corresponding to the DeviceAPI to be created
+        :param socket_ids: param that will be passed to the constructor of the DeviceAPI instance
+        :return: a DeviceAPI instance
+        """
+        if device == Device.PKG:
+            return PkgAPI(socket_ids)
+        if device == Device.DRAM:
+            return DramAPI(socket_ids)
