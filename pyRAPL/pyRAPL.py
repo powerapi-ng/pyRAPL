@@ -270,7 +270,6 @@ class PyRAPL:
             return measures
         else:
             for device in self._measure:
-                # print("dev {}, dev[0] {} ,dev[1] {}".format(dev,self.measure[dev][0],self.measure[dev][1]) )
                 if self._measure[device][0] and self._measure[device][1]:
                     measures[device] = self._compute_recorded_energy(device)
             if measures:
