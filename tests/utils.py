@@ -43,6 +43,8 @@ def empty_fs(fs):
     """
     create an empty file system
     """
+    fs.create_file('/sys/devices/system/cpu/present', contents='0')
+    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
     return fs
 
 @pytest.fixture
@@ -50,6 +52,9 @@ def fs_one_socket(fs):
     """
     create a file system containing energy metric for package and dram on one socket
     """
+    fs.create_file('/sys/devices/system/cpu/present', contents='0')
+    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
+
     fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
     fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
 
@@ -59,22 +64,35 @@ def fs_one_socket(fs):
 
 
 @pytest.fixture
-def fs_two_socket(fs_one_socket):
+def fs_two_socket(fs):
     """
     create a file system containing energy metric for package and dram on two socket
     """
-    fs_one_socket.create_file(SOCKET_1_DIR_NAME + '/name', contents='package-1\n')
-    fs_one_socket.create_file(PKG_1_FILE_NAME, contents=str(PKG_1_VALUE) + '\n')
+    fs.create_file('/sys/devices/system/cpu/present', contents='0-1')
+    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
+    fs.create_file('/sys/devices/system/cpu/cpu1/topology/physical_package_id', contents='1')
 
-    fs_one_socket.create_file(DRAM_1_DIR_NAME + '/name', contents='dram\n')
-    fs_one_socket.create_file(DRAM_1_FILE_NAME, contents=str(DRAM_1_VALUE) + '\n')
-    return fs_one_socket
+    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
+    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
+
+    fs.create_file(DRAM_0_DIR_NAME + '/name', contents='dram\n')
+    fs.create_file(DRAM_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
+
+    fs.create_file(SOCKET_1_DIR_NAME + '/name', contents='package-1\n')
+    fs.create_file(PKG_1_FILE_NAME, contents=str(PKG_1_VALUE) + '\n')
+
+    fs.create_file(DRAM_1_DIR_NAME + '/name', contents='dram\n')
+    fs.create_file(DRAM_1_FILE_NAME, contents=str(DRAM_1_VALUE) + '\n')
+    return fs
 
 @pytest.fixture
 def fs_one_socket_no_dram(fs):
     """
     create a file system containing energy metric for package and gpu and sys on one socket
     """
+    fs.create_file('/sys/devices/system/cpu/present', contents='0')
+    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
+    
     fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
     fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
 
