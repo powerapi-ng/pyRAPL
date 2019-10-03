@@ -75,4 +75,4 @@ class Sensor:
             print(energy)
             for socket_id in range(len(energy)):
                 result[socket_id * 2 + device] = energy[socket_id]
-        return tuple(result)
+        return result

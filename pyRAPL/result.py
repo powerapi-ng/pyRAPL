@@ -1,19 +1,17 @@
+
+
 # MIT License
-
-# Copyright (c) 2018, INRIA
-# Copyright (c) 2018, University of Lille
+# Copyright (c) 2019, INRIA
+# Copyright (c) 2019, University of Lille
 # All rights reserved.
-
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,14 +20,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from pyRAPL.exception import PyRAPLException, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
-from pyRAPL.exception import PyRAPLCantRecordEnergyConsumption
-from pyRAPL.device import Device
-from pyRAPL.device_api import DeviceAPI, PkgAPI, DramAPI, DeviceAPIFactory
-from pyRAPL.sensor import Sensor
-from pyRAPL.result import Result
+from typing import Tuple
 
+class Result :
+    """
+    A data class to represent the energy measures 
+    """ 
 
-# from pyRAPL.pyRAPL import measure_energy
+    def __init__(self,label: str = None,timestamp: float = None,duration: float  = None, pkg: Tuple[float] = None,dram:Tuple[float] = None  ) :
 
-__version__ = "0.1.0"
+        """ 
+        :param label: the name of the Measurement 
+        :param [float] timestamp: The begining of the measurement (in seconds )
+        :param [float] duration: The execution time (in seconds)  
+        :param tuple [float] pkg: The energy consumption of  CPU of different sockets  (in Joules )
+        :param tuple[float] dram: The energy consumption of DRAM in different sockets (in Joules)
+        """
+        self.label=label 
+        self.timestamp = timestamp 
+        self.duration = duration 
+        self.pkg = pkg.copy()
+        self.dram = dram.copy()
+        
