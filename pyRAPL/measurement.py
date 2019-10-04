@@ -1,4 +1,3 @@
-
 # MIT License
 # Copyright (c) 2019, INRIA
 # Copyright (c) 2019, University of Lille
@@ -20,43 +19,44 @@
 # SOFTWARE.
 
 
-from typing import List,Tupe
+from typing import List
 from time import time
-from pyRAPL import sensor,result 
+from pyRAPL import sensor, Result
 
 
-class Measurement : 
+class Measurement:
     """
-    An object used to record the energy measurement between two instances 
+    An object used to record the energy measurement between two instances
     """
-    def __init__(self, label : str ) : 
+    def __init__(self, label: str):
         self.label = label
-        self.a = ()
-        self.b = ()
+        self._energy_begin = None
+        self._ts_begin = None
+        self._results = None
+
         self.sensor = sensor.Sensor()
 
-    def begin(self): 
+    def begin(self):
         """
-        To start recording 
+        To start recording
         """
-        self.a=[time()] 
-        self.a = self.a +  self.sensor.energy()
+        self._energy_begin = self.sensor.energy()
+        self._ts_begin = time()
 
     def end(self):
-        self.b=[time()]
-        x=self.sensor.energy() 
-        self.d=[j-i for i,j in zip(self.a,self.b)]
-        self.b=self.b+x 
-        self._results =Result()
-        self._results.label = self.label 
-        self._results.timestamp=self.a[0]
-        self._results.duration=self.d[0]
-        self._pkg = self.d[::2] # get odd numbers 
-        self._dram = self.d[1::2] # get even numbers 
+        ts_end = time()
+        energy_end = self.sensor.energy()
 
-    def export(self, output): 
+        delta = energy_end - self._energy_begin
+        duration = ts_end - self._ts_begin
+        pkg = delta[0::2]  # get odd numbers
+        dram = delta[1::2]  # get even numbers
+
+        self._results = Result(self.label, self._ts_begin, duration, pkg, dram)
+
+    def export(self, output):
         output.add(self._results)
 
     @property
-    def result() -> Result:
+    def result(self) -> Result:
         return self._results
