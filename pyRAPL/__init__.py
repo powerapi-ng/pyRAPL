@@ -28,8 +28,9 @@ from pyRAPL.device import Device
 from pyRAPL.device_api import DeviceAPI, PkgAPI, DramAPI, DeviceAPIFactory
 from pyRAPL.sensor import Sensor
 from pyRAPL.result import Result
-
-
-# from pyRAPL.pyRAPL import measure_energy
-
+from pyRAPL.pyRAPL import setup
+from pyRAPL.measurement import Measurement
 __version__ = "0.1.0"
+
+sensor = None
+

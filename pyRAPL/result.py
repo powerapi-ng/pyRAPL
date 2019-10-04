@@ -1,5 +1,3 @@
-
-
 # MIT License
 # Copyright (c) 2019, INRIA
 # Copyright (c) 2019, University of Lille
@@ -20,25 +18,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Tuple
+from typing import Optional, List
 
-class Result :
+class Result:
     """
     A data class to represent the energy measures 
     """ 
 
-    def __init__(self,label: str = None,timestamp: float = None,duration: float  = None, pkg: Tuple[float] = None,dram:Tuple[float] = None  ) :
-
-        """ 
-        :param label: the name of the Measurement 
+    def __init__(self, label: str, timestamp: float, duration: float, pkg: Optional[List[float]] = None,
+                 dram: Optional[List[float]] = None):
+        """
+        :param label: the name of the Measurement
         :param [float] timestamp: The begining of the measurement (in seconds )
-        :param [float] duration: The execution time (in seconds)  
+        :param [float] duration: The execution time (in seconds)n
         :param tuple [float] pkg: The energy consumption of  CPU of different sockets  (in Joules )
         :param tuple[float] dram: The energy consumption of DRAM in different sockets (in Joules)
         """
-        self.label=label 
-        self.timestamp = timestamp 
-        self.duration = duration 
-        self.pkg = pkg.copy()
-        self.dram = dram.copy()
-        
+        self.label = label
+        self.timestamp = timestamp
+        self.duration = duration
+        self.pkg = pkg.copy() if pkg is not None else None
+        self.dram = dram.copy() if dram is not None else None
+
+        def __str__(self):
+            s = 'label : ' + self.label
+            s += 'ts : ' + str(self.timestamp)
+            s += 'duration : ' + str(self.duration)
+            s += 'pkg : ' + str(self.pkg)
+            s += 'dram : ' + str(self.dram)
+            return s
+
+
+        def __repr__(self):
+            s = 'label : ' + self.label
+            s += 'ts : ' + str(self.timestamp)
+            s += 'duration : ' + str(self.duration)
+            s += 'pkg : ' + str(self.pkg)
+            s += 'dram : ' + str(self.dram)
+            return s

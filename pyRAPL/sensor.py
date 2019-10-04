@@ -17,12 +17,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from pyRAPL import Device, DeviceAPIFactory, PyRAPLCantInitDeviceAPI, PyRAPLCantRecordEnergyConsumption
 from pyRAPL import PyRAPLBadSocketIdException
 
+class SubstractableList(list):
+    
+    def __sub__(self, other):
+        if len(other) != len(self):
+            raise ValueError("List are not of the same length")
+        return [a - b for a, b in zip(self, other)]
 
 class Sensor:
     """
@@ -38,7 +43,7 @@ class Sensor:
         :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about a device given in
                                                   parameter
         :raise PyRAPLBadSocketIdException: if the sensor can't get energy information about a device given in
-                                                  parameter
+                                           parameter
         """
         self._available_devices = []
         self._device_api = {}
@@ -60,19 +65,16 @@ class Sensor:
 
         self._socket_ids = socket_ids if socket_ids is not None else list(self._device_api.values())[0]._socket_ids
 
-    def energy(self) -> Tuple[float, ...]:
+    def energy(self) -> SubstractableList:
         """
         get the power consumption of all the monitored devices
         :return: a tuple containing the power consumption of each device for each socket. The tuple structure is :
                  (pkg energy socket 0, dram energy socket 0, ..., pkg energy socket N, dram energy socket N)
         """
-
-        result = [-1, -1] * (self._socket_ids[-1] + 1)
+        result = SubstractableList([-1, -1] * (self._socket_ids[-1] + 1))
         # print((result, self._socket_ids))
         for device in self._available_devices:
             energy = self._device_api[device].energy()
-            print(energy)
-            print(energy)
             for socket_id in range(len(energy)):
                 result[socket_id * 2 + device] = energy[socket_id]
         return result
