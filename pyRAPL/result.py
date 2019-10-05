@@ -19,40 +19,48 @@
 # SOFTWARE.
 
 from typing import Optional, List
+from dataclasses import dataclass
 
+@dataclass(frozen = True)
 class Result:
     """
     A data class to represent the energy measures 
     """ 
 
-    def __init__(self, label: str, timestamp: float, duration: float, pkg: Optional[List[float]] = None,
-                 dram: Optional[List[float]] = None):
-        """
-        :param label: the name of the Measurement
-        :param [float] timestamp: The begining of the measurement (in seconds )
-        :param [float] duration: The execution time (in seconds)n
-        :param tuple [float] pkg: The energy consumption of  CPU of different sockets  (in Joules )
-        :param tuple[float] dram: The energy consumption of DRAM in different sockets (in Joules)
-        """
-        self.label = label
-        self.timestamp = timestamp
-        self.duration = duration
-        self.pkg = pkg.copy() if pkg is not None else None
-        self.dram = dram.copy() if dram is not None else None
+    label: str 
+    timestamp: float 
+    duration: float 
+    pkg: Optional[List[float]] = None
+    dram: Optional[List[float]] = None
 
-        def __str__(self):
-            s = 'label : ' + self.label
-            s += 'ts : ' + str(self.timestamp)
-            s += 'duration : ' + str(self.duration)
-            s += 'pkg : ' + str(self.pkg)
-            s += 'dram : ' + str(self.dram)
-            return s
+    # def __init__(self, label: str, timestamp: float, duration: float, pkg: Optional[List[float]] = None,
+    #              dram: Optional[List[float]] = None):
+    #     """
+    #     :param label: the name of the Measurement
+    #     :param [float] timestamp: The begining of the measurement (in seconds )
+    #     :param [float] duration: The execution time (in seconds)n
+    #     :param tuple [float] pkg: The energy consumption of  CPU of different sockets  (in Joules )
+    #     :param tuple[float] dram: The energy consumption of DRAM in different sockets (in Joules)
+    #     """
+    #     self.label = label
+    #     self.timestamp = timestamp
+    #     self.duration = duration
+    #     self.pkg = pkg.copy() if pkg is not None else None
+    #     self.dram = dram.copy() if dram is not None else None
+
+    #     def __str__(self):
+    #         s = 'label : ' + self.label
+    #         s += 'ts : ' + str(self.timestamp)
+    #         s += 'duration : ' + str(self.duration)
+    #         s += 'pkg : ' + str(self.pkg)
+    #         s += 'dram : ' + str(self.dram)
+    #         return s
 
 
-        def __repr__(self):
-            s = 'label : ' + self.label
-            s += 'ts : ' + str(self.timestamp)
-            s += 'duration : ' + str(self.duration)
-            s += 'pkg : ' + str(self.pkg)
-            s += 'dram : ' + str(self.dram)
-            return s
+    #     def __repr__(self):
+    #         s = 'label : ' + self.label
+    #         s += 'ts : ' + str(self.timestamp)
+    #         s += 'duration : ' + str(self.duration)
+    #         s += 'pkg : ' + str(self.pkg)
+    #         s += 'dram : ' + str(self.dram)
+    #         return s
