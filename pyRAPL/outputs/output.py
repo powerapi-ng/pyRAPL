@@ -65,8 +65,3 @@ class PrintOutput:
         """ 
         print(s)
 
-
-res=Result("lala",12341234.234,22.234,[12.],[143.4])
-
-p= PrintOutput()
-p.add(res)

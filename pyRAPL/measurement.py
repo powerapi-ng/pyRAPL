@@ -18,22 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import functools
 
 from typing import List
 from time import time
 from pyRAPL import sensor, Result
-
+from pyRAPL import PrintOutput, Output
 
 class Measurement:
     """
     An object used to record the energy measurement between two instances
     """
-    def __init__(self, label: str):
+    def __init__(self, label: str,output : Output = None ):
         self.label = label
         self._energy_begin = None
         self._ts_begin = None
         self._results = None
-
+        self._output = output if output is not None  else PrintOutput() 
         self.sensor = sensor.Sensor()
 
     def begin(self):
@@ -54,9 +55,38 @@ class Measurement:
 
         self._results = Result(self.label, self._ts_begin, duration, pkg, dram)
 
-    def export(self, output):
-        output.add(self._results)
+    def export(self, output=None):
+        if output is None : 
+            self._output.add(self._results) 
+        else:
+            output.add(self._results)
+
 
     @property
     def result(self) -> Result:
         return self._results
+
+
+
+def measure(_func=None, *, output:Output =None):
+    """ a decorator to measure the energy consumption of a function recorded by PyRAPL
+    :param Output output : to handle the results recorded from pyrapl
+    """
+
+
+    def decorator_measure_energy(func):
+        @functools.wraps(func)
+        def wrapper_measure(*args, **kwargs):
+            sensor = Measurement(func.__name__,output)
+            sensor.begin()
+            val = func(*args, **kwargs)
+            sensor.end()
+            sensor.export()
+            return val
+        return wrapper_measure
+
+    if _func is None:
+        # to ensure the working system when you call it with parameters or without parameters
+        return decorator_measure_energy
+    else:
+        return decorator_measure_energy(_func)
