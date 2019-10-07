@@ -24,6 +24,7 @@ from typing import List
 from time import time
 from pyRAPL import sensor, Result
 from pyRAPL import PrintOutput, Output
+from pyRAPL import __sensor, Result
 
 class Measurement:
     """
@@ -34,8 +35,13 @@ class Measurement:
         self._energy_begin = None
         self._ts_begin = None
         self._results = None
+<<<<<<< HEAD
         self._output = output if output is not None  else PrintOutput() 
         self.sensor = sensor.Sensor()
+=======
+
+        self.sensor = __sensor
+>>>>>>> refactor: add global sensor
 
     def begin(self):
         """

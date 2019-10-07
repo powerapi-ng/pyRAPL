@@ -81,34 +81,33 @@ def test_monitor_socket_1_but_one_socket(fs_one_socket):
 class SensorParam:
     def __init__(self, devices, sockets, one_socket_result, two_socket_result):
 
-        def div_if_positive_tuple(t, n):
-            print((t, n))
-            r = ()
+        def div_if_positive_list(t, n):
+            r = []
             for v in t:
                 if v > 0:
-                    r += (v / n,)
+                    r.append(v / n)
                 else:
-                    r += (v,)
+                    r.append(v)
             return r
 
         self.devices = devices
         self.sockets = sockets
-        self.one_socket_result = div_if_positive_tuple(one_socket_result, 1000000) if one_socket_result is not None else None
-        self.two_socket_result = div_if_positive_tuple(two_socket_result, 1000000)
+        self.one_socket_result = div_if_positive_list(one_socket_result, 1000000) if one_socket_result is not None else None
+        self.two_socket_result = div_if_positive_list(two_socket_result, 1000000)
         # assert False
 
 
 @pytest.fixture(params=[
-    SensorParam(None, None, (PKG_0_VALUE, DRAM_0_VALUE), (PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE, DRAM_1_VALUE)),
-    SensorParam([Device.PKG], None, (PKG_0_VALUE, -1), (PKG_0_VALUE, -1, PKG_1_VALUE, -1)),
-    SensorParam([Device.DRAM], None, (-1, DRAM_0_VALUE), (-1, DRAM_0_VALUE, -1, DRAM_1_VALUE)),
-    SensorParam([Device.PKG, Device.DRAM], None, (PKG_0_VALUE, DRAM_0_VALUE), (PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE,
-                                                                               DRAM_1_VALUE)),
+    SensorParam(None, None, [PKG_0_VALUE, DRAM_0_VALUE], [PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE, DRAM_1_VALUE]),
+    SensorParam([Device.PKG], None, [PKG_0_VALUE, -1], [PKG_0_VALUE, -1, PKG_1_VALUE, -1]),
+    SensorParam([Device.DRAM], None, [-1, DRAM_0_VALUE], [-1, DRAM_0_VALUE, -1, DRAM_1_VALUE]),
+    SensorParam([Device.PKG, Device.DRAM], None, [PKG_0_VALUE, DRAM_0_VALUE], [PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE,
+                                                                               DRAM_1_VALUE]),
 
-    SensorParam(None, [0], (PKG_0_VALUE, DRAM_0_VALUE), (PKG_0_VALUE, DRAM_0_VALUE)),
-    SensorParam([Device.PKG], [0], (PKG_0_VALUE, -1), (PKG_0_VALUE, -1)),
-    SensorParam([Device.DRAM], [0], (-1, DRAM_0_VALUE), (-1, DRAM_0_VALUE)),
-    SensorParam([Device.PKG, Device.DRAM], [0], (PKG_0_VALUE, DRAM_0_VALUE), (PKG_0_VALUE, DRAM_0_VALUE)),
+    SensorParam(None, [0], [PKG_0_VALUE, DRAM_0_VALUE], [PKG_0_VALUE, DRAM_0_VALUE]),
+    SensorParam([Device.PKG], [0], [PKG_0_VALUE, -1], [PKG_0_VALUE, -1]),
+    SensorParam([Device.DRAM], [0], [-1, DRAM_0_VALUE], [-1, DRAM_0_VALUE]),
+    SensorParam([Device.PKG, Device.DRAM], [0], [PKG_0_VALUE, DRAM_0_VALUE], [PKG_0_VALUE, DRAM_0_VALUE]),
 ])
 def sensor_param(request):
     """
@@ -125,16 +124,16 @@ def sensor_param(request):
 
 
 @pytest.fixture(params=[
-    SensorParam(None, [1], None, (-1, -1, PKG_1_VALUE, DRAM_1_VALUE)),
-    SensorParam([Device.PKG], [1], None, (-1, -1, PKG_1_VALUE, -1)),
-    SensorParam([Device.DRAM], [1], None, (-1, -1, -1, DRAM_1_VALUE)),
-    SensorParam([Device.PKG, Device.DRAM], [1], None, (-1, -1, PKG_1_VALUE, DRAM_1_VALUE)),
+    SensorParam(None, [1], None, [-1, -1, PKG_1_VALUE, DRAM_1_VALUE]),
+    SensorParam([Device.PKG], [1], None, [-1, -1, PKG_1_VALUE, -1]),
+    SensorParam([Device.DRAM], [1], None, [-1, -1, -1, DRAM_1_VALUE]),
+    SensorParam([Device.PKG, Device.DRAM], [1], None, [-1, -1, PKG_1_VALUE, DRAM_1_VALUE]),
 
-    SensorParam(None, [0, 1], (PKG_0_VALUE, DRAM_0_VALUE), (PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE, DRAM_1_VALUE)),
-    SensorParam([Device.PKG], [0, 1], (PKG_0_VALUE, -1), (PKG_0_VALUE, -1, PKG_1_VALUE, -1)),
-    SensorParam([Device.DRAM], [0, 1], (-1, DRAM_0_VALUE), (-1, DRAM_0_VALUE, -1, DRAM_1_VALUE)),
-    SensorParam([Device.PKG, Device.DRAM], [0, 1], (PKG_0_VALUE, DRAM_0_VALUE), (PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE,
-                                                                                 DRAM_1_VALUE))
+    SensorParam(None, [0, 1], [PKG_0_VALUE, DRAM_0_VALUE], [PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE, DRAM_1_VALUE]),
+    SensorParam([Device.PKG], [0, 1], [PKG_0_VALUE, -1], [PKG_0_VALUE, -1, PKG_1_VALUE, -1]),
+    SensorParam([Device.DRAM], [0, 1], [-1, DRAM_0_VALUE], [-1, DRAM_0_VALUE, -1, DRAM_1_VALUE]),
+    SensorParam([Device.PKG, Device.DRAM], [0, 1], [PKG_0_VALUE, DRAM_0_VALUE], [PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE,
+                                                                                 DRAM_1_VALUE])
 ])
 def sensor_param_monitor_socket_1(request):
     parameters = request.param
