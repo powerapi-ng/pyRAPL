@@ -38,19 +38,18 @@ class Measurement:
         self._results = None
         self._output = output if output is not None  else PrintOutput()
 
-        self.sensor = pyRAPL.__sensor
-
+        self._sensor = pyRAPL._sensor
 
     def begin(self):
         """
         To start recording
         """
-        self._energy_begin = self.sensor.energy()
+        self._energy_begin = self._sensor.energy()
         self._ts_begin = time()
 
     def end(self):
         ts_end = time()
-        energy_end = self.sensor.energy()
+        energy_end = self._sensor.energy()
 
         delta = energy_end - self._energy_begin
         duration = ts_end - self._ts_begin
