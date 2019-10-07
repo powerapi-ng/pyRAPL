@@ -1,5 +1,3 @@
-
-
 # MIT License
 # Copyright (c) 2019, INRIA
 # Copyright (c) 2019, University of Lille
@@ -19,9 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-
-
 import abc
 
 from pyRAPL import Result
@@ -29,14 +24,11 @@ from pyRAPL import Result
 
 class Output(abc.ABC):
     """
-    Abstract class that represent an output handler for the Measurement class 
-    """ 
+    Abstract class that represent an output handler for the Measurement class
+    """
 
     @abc.abstractmethod
-    def add(self,result:Result):
+    def add(self, result: Result):
         """
-            Handle the object Results 
+        Handle the object Results
         """
-        pass
-    #
-

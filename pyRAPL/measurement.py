@@ -24,24 +24,22 @@ from typing import List
 from time import time
 from pyRAPL import sensor, Result
 from pyRAPL import PrintOutput, Output
-from pyRAPL import __sensor, Result
+from pyRAPL import Result
+import pyRAPL
 
 class Measurement:
     """
     An object used to record the energy measurement between two instances
     """
-    def __init__(self, label: str,output : Output = None ):
+    def __init__(self, label: str, output: Output = None):
         self.label = label
         self._energy_begin = None
         self._ts_begin = None
         self._results = None
-<<<<<<< HEAD
-        self._output = output if output is not None  else PrintOutput() 
-        self.sensor = sensor.Sensor()
-=======
+        self._output = output if output is not None  else PrintOutput()
 
-        self.sensor = __sensor
->>>>>>> refactor: add global sensor
+        self.sensor = pyRAPL.__sensor
+
 
     def begin(self):
         """
@@ -62,8 +60,8 @@ class Measurement:
         self._results = Result(self.label, self._ts_begin, duration, pkg, dram)
 
     def export(self, output=None):
-        if output is None : 
-            self._output.add(self._results) 
+        if output is None:
+            self._output.add(self._results)
         else:
             output.add(self._results)
 
@@ -74,7 +72,7 @@ class Measurement:
 
 
 
-def measure(_func=None, *, output:Output =None):
+def measure(_func=None, *, output: Output = None):
     """ a decorator to measure the energy consumption of a function recorded by PyRAPL
     :param Output output : to handle the results recorded from pyrapl
     """
@@ -83,7 +81,7 @@ def measure(_func=None, *, output:Output =None):
     def decorator_measure_energy(func):
         @functools.wraps(func)
         def wrapper_measure(*args, **kwargs):
-            sensor = Measurement(func.__name__,output)
+            sensor = Measurement(func.__name__, output)
             sensor.begin()
             val = func(*args, **kwargs)
             sensor.end()
