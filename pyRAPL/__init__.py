@@ -35,5 +35,5 @@ from pyRAPL.outputs import *
 from pyRAPL.measurement import Measurement ,measure
 __version__ = "0.1.0"
 
-sensor = None
+__sensor = None
 

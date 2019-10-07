@@ -17,28 +17,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import pandas
-import time
+from typing import List, Optional
+from pyRAPL import Sensor, Device, sensor
 
 
-from .output import *
-
-@Output.register
-class DataFrameOutput:
-
-    def __init__(self):
-        self._data = None
-        self._data = pandas.DataFrame(columns=list(Result.__annotations__.keys()) + ["socket"])
-
-    def add(self, result):
-        x = dict(vars(result))
-        x['timestamp'] = time.ctime(x['timestamp'])
-        for i in range(len(result.pkg)):
-            x['socket'] = i
-            x['pkg'] = result.pkg[i]
-            x['dram'] = result.dram[i]
-            self._data = self._data.append(x, ignore_index=True)
-
-    @property
-    def data(self) -> pandas.DataFrame:
-        return self._data
+def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
+    """
+    Configure the pyRAPL sensor
+    :param devices: list of device to get power consumption if None, all the devices available on the machine will
+                    be monitored
+    :param socket_ids: if None, the API will get the power consumption of the whole machine otherwise, it will
+                       get the power consumption of the devices on the given socket package
+    :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about a device given in
+                                              parameter
+    :raise PyRAPLBadSocketIdException: if the sensor can't get energy information about a device given in
+                                       parameter
+    """
+    sensor = Sensor(devices=devices, socket_ids=socket_ids)
