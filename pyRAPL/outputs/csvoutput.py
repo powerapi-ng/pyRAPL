@@ -19,7 +19,9 @@
 # SOFTWARE.
 import os
 from typing import List
-from .output import *
+
+from pyRAPL import Result
+from pyRAPL.outputs import Output
 
 @Output.register
 class CSVOutput:
