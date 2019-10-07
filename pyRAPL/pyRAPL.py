@@ -18,7 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from typing import List, Optional
-from pyRAPL import Sensor, Device, sensor
+from pyRAPL import Sensor, Device
+import pyRAPL
 
 
 def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
@@ -33,4 +34,4 @@ def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]
     :raise PyRAPLBadSocketIdException: if the sensor can't get energy information about a device given in
                                        parameter
     """
-    sensor = Sensor(devices=devices, socket_ids=socket_ids)
+    pyRAPL._sensor = Sensor(devices=devices, socket_ids=socket_ids)

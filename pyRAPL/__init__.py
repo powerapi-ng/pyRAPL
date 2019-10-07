@@ -28,6 +28,7 @@ from pyRAPL.device import Device
 from pyRAPL.device_api import DeviceAPI, PkgAPI, DramAPI, DeviceAPIFactory
 from pyRAPL.sensor import Sensor
 from pyRAPL.result import Result
+from pyRAPL.pyRAPL import setup
 # from pyRAPL.outputs.output import *
 from pyRAPL.outputs import *
 
@@ -35,5 +36,5 @@ from pyRAPL.outputs import *
 from pyRAPL.measurement import Measurement ,measure
 __version__ = "0.1.0"
 
-__sensor = None
+_sensor = None
 
