@@ -24,12 +24,12 @@ from .output import *
 @Output.register
 class CSVOutput:
 
-    def __init__(self,filename):
+    def __init__(self, filename):
         self.filename = filename
         self.header = ",".join(list(Result.__annotations__.keys()) + ["socket"]) + "\n"
         self._data = []
 
-    def add(self,result):
+    def add(self, result):
         x = dict(vars(result))
         x['timestamp'] = x['timestamp']
         for i in range(len(result.pkg)):

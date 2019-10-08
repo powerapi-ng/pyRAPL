@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from ..outputs import *
-
+import time
 @Output.register
 class PrintOutput:
     """
@@ -33,7 +33,7 @@ class PrintOutput:
             return s
 
         s = f"""
-        Lable : {result.label}
+        Label : {result.label}
         Begin : {time.ctime(result.timestamp)}
         Duration : {result.duration} s
         -------------------------------

@@ -33,8 +33,8 @@ def cpu_ids() -> List[int]:
     cpu_id_list = []
     for i in range(len(cpu_id_tmp)):
         if cpu_id_tmp[i] == '-':
-            for id in range(int(cpu_id_tmp[i-1]) + 1, int(cpu_id_tmp[i+1])):
-                cpu_id_list.append(int(id))
+            for cpu_id in range(int(cpu_id_tmp[i - 1]) + 1, int(cpu_id_tmp[i + 1])):
+                cpu_id_list.append(int(cpu_id))
         else:
             cpu_id_list.append(int(cpu_id_tmp[i]))
     return cpu_id_list
@@ -91,12 +91,15 @@ class DeviceAPI:
             """
             dirname, _ = directory_info
             f_name = open(dirname + '/name', 'r')
-            package_id = int(f_name.readline()[:-1].split('-')[1])
+            pkg_str = f_name.readline()
+            if 'package' not in pkg_str:
+                return
+            package_id = int(pkg_str[:-1].split('-')[1])
 
             if self._socket_ids is not None and package_id not in self._socket_ids:
-                pass
-            else:
-                result.append((package_id, ) + directory_info)
+                return
+            result.append((package_id, ) + directory_info)
+
         rapl_id = 0
         result_list = []
         while os.path.exists('/sys/class/powercap/intel-rapl/intel-rapl:' + str(rapl_id)):
