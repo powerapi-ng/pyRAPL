@@ -42,7 +42,7 @@ def test_decorator_measure(fs_one_socket):
     """
     pyRAPL.setup()
 
-    csv_output = pyRAPL.CSVOutput('output.csv')
+    csv_output = pyRAPL.outputs.CSVOutput('output.csv')
 
     @pyRAPL.measure(output=csv_output)
     def measurable_function(a):

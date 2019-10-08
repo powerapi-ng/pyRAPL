@@ -23,7 +23,7 @@ import functools
 from typing import List
 from time import time
 from pyRAPL import sensor, Result
-from pyRAPL import PrintOutput, Output
+from pyRAPL.outputs import PrintOutput, Output
 from pyRAPL import Result
 import pyRAPL
 
