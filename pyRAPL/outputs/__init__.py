@@ -19,15 +19,25 @@
 # SOFTWARE.
 
 
+# from  exception import ImportError
 
-# import Output
+import logging 
 
 from .output  import Output
 from .printoutput import PrintOutput
 from .csvoutput import CSVOutput
 
+
 try:
-    from .dataframeoutput import DataFrameOutput
-except:
-    # TODO: add proper warning  message
-    print(" can't import DataFrameOutPut due to missing modules ")
+    from .mongooutput import MongoOutput
+
+except ImportError as e  : 
+    print(e)
+    logging.error("imports error \n You need to install pymongo>=3.9.0 in order to use MongoOutput ")
+
+try: 
+    from .dataframeoutput import DataFrameOutput 
+
+except ImportError as e  : 
+    print(e)
+    logging.error("imports error \n  You need to install pandas>=0.25.1 in order to use DataFrameOutput ")

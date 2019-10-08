@@ -17,18 +17,32 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import os
+
+
+
+
 from typing import List
+import asyncio
+
+
+
+import pymongo 
 
 from pyRAPL import Result
 from pyRAPL.outputs import Output
 
 @Output.register
-class CSVOutput:
+class MongoOutput:
+        
+    def __init__(self,serveraddr, serverport,database,collection):
+        """
+        export the results to a collection in a mongo database 
 
-    def __init__(self,filename):
-        self.filename = filename
-        self._header = ",".join(list(Result.__annotations__.keys()) + ["socket"]) + "\n"
+        """
+        self._client = pymongo.MongoClient(serveraddr, serverport)
+        self._db=self._client[database]
+        self._collection = self._db[collection]
+        # self.header = ",".join(list(Result.__annotations__.keys()) + ["socket"]) + "\n"
         self._data = []
 
     def add(self,result):
@@ -43,19 +57,12 @@ class CSVOutput:
     @property
     def data(self) -> List:
         return self._data
-
+    
     def save(self):
         """"
-        Save the curent data in a csv file . If the file exists it will append the results in the end and the file
-        otherwise it will create a new file.
+        save data into a mongo database 
         After saving. the data will be removed from the RAM memeory
         """
-        cond = os.path.exists(self.filename)
-        with open(self.filename, "a+") as f:
-            if not cond:
-                f.writelines(self._header)
-            for i in self._data:
-                s = ",".join([str(j) for j in i.values()]) + "\n"
-                f.writelines(s)
+        self._collection.insert_many(self.data)
         del self._data
         self._data = []
