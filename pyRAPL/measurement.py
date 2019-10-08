@@ -36,7 +36,7 @@ class Measurement:
         self._energy_begin = None
         self._ts_begin = None
         self._results = None
-        self._output = output if output is not None  else PrintOutput()
+        self._output = output if output is not None else PrintOutput()
 
         self._sensor = pyRAPL._sensor
 
@@ -63,7 +63,6 @@ class Measurement:
             self._output.add(self._results)
         else:
             output.add(self._results)
-
 
     @property
     def result(self) -> Result:

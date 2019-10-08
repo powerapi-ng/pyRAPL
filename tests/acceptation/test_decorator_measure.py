@@ -19,36 +19,54 @@
 # SOFTWARE.
 
 from tests.utils import fs_one_socket, write_new_energy_value, PKG_0_VALUE, DRAM_0_VALUE
+from mock import patch
 import time
+
 import pyRAPL
 
 POWER_CONSUMPTION_PKG = 20000
 POWER_CONSUMPTION_DRAM = 30000
 
-def measurable_function(a):
-    # Power consumption of the function
-    write_new_energy_value(POWER_CONSUMPTION_PKG, pyRAPL.Device.PKG, 0)
-    write_new_energy_value(POWER_CONSUMPTION_DRAM, pyRAPL.Device.DRAM, 0)
-    return 1 + a
-
-def test_nomal_measure_bench(fs_one_socket):
+def test_decorator_measure(fs_one_socket):
     """
-    Test to measure the power consumption of a function using the Measurement class
+    Test to measure the power consumption of a function using the measure decorator
 
-    - launch the measure
-    - write a new value to the RAPL power measurement api file
-    - launch a function
-    - end the measure
+    - decorate a function with the measure decorator and use a CSVOutput
+    - launch the function
+    - read the produced csv file
 
     Test if:
-      - the power consumption measured is the delta between the first and the last value in the RAPL power measurement
-        file
+      - the file contains 1 line + 1 header
+      - a line contains the DRAM power consumption
+      - a line contains the PKG power consumption
     """
     pyRAPL.setup()
-    measure = pyRAPL.Measurement('toto')
-    measure.begin()
-    measurable_function(1)
-    measure.end()
 
-    assert measure.result.pkg == [(POWER_CONSUMPTION_PKG - PKG_0_VALUE) / 1000000]
-    assert measure.result.dram == [(POWER_CONSUMPTION_DRAM - DRAM_0_VALUE) / 1000000]
+    csv_output = pyRAPL.CSVOutput('output.csv')
+
+    @pyRAPL.measure(output=csv_output)
+    def measurable_function(a):
+        # Power consumption of the function
+        write_new_energy_value(POWER_CONSUMPTION_PKG, pyRAPL.Device.PKG, 0)
+        write_new_energy_value(POWER_CONSUMPTION_DRAM, pyRAPL.Device.DRAM, 0)
+        return 1 + a
+
+    measurable_function(1)
+
+    csv_output.save()
+
+    csv = open('output.csv', 'r')
+
+    # flush header
+    csv.readline()
+
+    n_lines = 0
+    for line in csv:
+        n_lines += 1
+        content = line.split(',')
+        print(content)
+        assert content[0] == 'measurable_function'
+        assert content[3] == str((POWER_CONSUMPTION_PKG - PKG_0_VALUE) / 1000000)
+        assert content[4] == str((POWER_CONSUMPTION_DRAM - DRAM_0_VALUE) / 1000000)
+
+    assert n_lines == 1

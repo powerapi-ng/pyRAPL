@@ -22,9 +22,9 @@ import pytest
 
 from pyRAPL import PkgAPI, DramAPI, DeviceAPIFactory, Device, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
 from pyRAPL.device_api import cpu_ids, get_socket_ids
-from utils import PKG_0_FILE_NAME, PKG_0_VALUE, PKG_1_FILE_NAME, PKG_1_VALUE
-from utils import DRAM_0_FILE_NAME, DRAM_0_VALUE, DRAM_1_FILE_NAME, DRAM_1_VALUE
-from utils import empty_fs, fs_one_socket, fs_two_socket, fs_one_socket_no_dram
+from tests.utils import PKG_0_FILE_NAME, PKG_0_VALUE, PKG_1_FILE_NAME, PKG_1_VALUE
+from tests.utils import DRAM_0_FILE_NAME, DRAM_0_VALUE, DRAM_1_FILE_NAME, DRAM_1_VALUE
+from tests.utils import empty_fs, fs_one_socket, fs_two_socket, fs_one_socket_no_dram
 
 class DeviceParameters:
     def __init__(self, device_class, socket0_filename, socket0_value, socket1_filename, socket1_value):
@@ -89,6 +89,49 @@ def test_init_no_rapl_files(empty_fs, device_api_param):
     """
     with pytest.raises(PyRAPLCantInitDeviceAPI):
         device_api_param.device_class()
+
+
+def test_init_psys_files_one_sockets(fs_one_socket, device_api_param):
+    """
+    create a DeviceAPI (PkgAPI and DramAPI) instance with a filesystem containing rapl files for socket 0 and psys
+    domain
+    Test if:
+      - the attribute DeviceAPI._sys_files is a list of length 1
+      - the attribute DeviceAPI._sys_files contains a file (test the file's name)
+    """
+    fs_one_socket.create_file('/sys/class/powercap/intel-rapl/intel-rapl:1/name', contents='psys\n')
+
+    device_api = device_api_param.device_class()
+    assert isinstance(device_api._sys_files, list)
+    assert len(device_api._sys_files) == 1
+    assert device_api._sys_files[0].name == device_api_param.socket0_filename
+
+
+def test_init_psys_files_two_sockets(fs):
+    """
+    create a DeviceAPI (PkgAPI and DramAPI) instance with a filesystem containing rapl files for socket 0 and 1 and psys
+    domain
+    Test if:
+      - the attribute DeviceAPI._sys_files is a list of length 2
+      - the attribute DeviceAPI._sys_files contains two file (test the file's name)
+    """
+    fs.create_file('/sys/devices/system/cpu/present', contents='0-1')
+    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
+    fs.create_file('/sys/devices/system/cpu/cpu1/topology/physical_package_id', contents='1')
+
+    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:0/name', contents='package-0\n')
+    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
+
+    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:1/name', contents='psys\n')
+
+    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:2/name', contents='package-1\n')
+    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:2/energy_uj', contents=str(PKG_1_VALUE) + '\n')
+
+    device_api = PkgAPI()
+    assert isinstance(device_api._sys_files, list)
+    assert len(device_api._sys_files) == 2
+    assert device_api._sys_files[0].name == PKG_0_FILE_NAME
+    assert device_api._sys_files[1].name == '/sys/class/powercap/intel-rapl/intel-rapl:2/energy_uj'
 
 
 def test_init_one_file_one_socket(fs_one_socket, device_api_param):
