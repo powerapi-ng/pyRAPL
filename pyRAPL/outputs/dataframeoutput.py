@@ -26,7 +26,7 @@ import pandas
 from pyRAPL import Result
 from pyRAPL.outputs import Output
 
-# @Output.register
+@Output.register
 class DataFrameOutput:
 
     def __init__(self):
