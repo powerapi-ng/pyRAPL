@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from pyRAPL import Device
+import os
 import pytest
 import pyfakefs
 
@@ -37,6 +39,20 @@ DRAM_0_VALUE = 6789
 DRAM_1_FILE_NAME = DRAM_1_DIR_NAME + '/energy_uj'
 DRAM_1_VALUE = 9876
 
+
+def write_new_energy_value(val, device, socket_id):
+    file_names = {
+        Device.PKG: [PKG_0_FILE_NAME, PKG_1_FILE_NAME],
+        Device.DRAM: [DRAM_0_FILE_NAME, DRAM_1_FILE_NAME]
+    }
+
+    api_file_name = file_names[device][socket_id]
+    if not os.path.exists(api_file_name):
+        return
+    api_file = open(api_file_name, 'w')
+    print(str(val) + '\n')
+    api_file.write(str(val) + '\n')
+    api_file.close()
 
 @pytest.fixture
 def empty_fs(fs):

@@ -22,8 +22,8 @@ import pytest
 
 from pyRAPL import Sensor, Device, PkgAPI
 from pyRAPL import PyRAPLCantRecordEnergyConsumption, PyRAPLCantRecordEnergyConsumption, PyRAPLBadSocketIdException
-from utils import PKG_0_VALUE, PKG_1_VALUE, DRAM_0_VALUE, DRAM_1_VALUE
-from utils import empty_fs, fs_one_socket, fs_two_socket, fs_one_socket_no_dram
+from tests.utils import PKG_0_VALUE, PKG_1_VALUE, DRAM_0_VALUE, DRAM_1_VALUE
+from tests.utils import empty_fs, fs_one_socket, fs_two_socket, fs_one_socket_no_dram
 
 
 ########
