@@ -21,7 +21,9 @@ import pandas
 import time
 
 
-from .output import *
+from pyRAPL import Result
+from pyRAPL.outputs import Output
+import time 
 
 @Output.register
 class DataFrameOutput:
