@@ -32,7 +32,6 @@ from pyRAPL.pyRAPL import setup
 # from pyRAPL.outputs.output import *
 from pyRAPL.outputs import *
 
-# from pyRAPL.pyRAPL import setup
 from pyRAPL.measurement import Measurement ,measure
 __version__ = "0.1.0"
 
