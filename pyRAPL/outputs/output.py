@@ -17,23 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import List, Optional
-from pyRAPL import Sensor, Device
-import pyRAPL
+from pyRAPL import Result
 
 
-def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
+class Output:
     """
-    Configure which device and CPU socket should be monitored by pyRAPL
-
-    This function must be called before using any other pyRAPL functions
-
-    :param devices: list of monitored devices if None, all the available devices on the machine will be monitored
-
-    :param socket_ids: list of monitored sockets, if None, all the available socket on the machine will be monitored
-
-    :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about the given device in parameter
-
-    :raise PyRAPLBadSocketIdException: if the given socket in parameter doesn't exist
+    Abstract class that represent an output handler for the `Measurement` class
     """
-    pyRAPL._sensor = Sensor(devices=devices, socket_ids=socket_ids)
+
+    def add(self, result: Result):
+        """
+        Handle the object `Result`
+
+        :param result: data to handle
+        """
+        raise NotImplementedError()

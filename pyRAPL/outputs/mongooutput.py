@@ -17,23 +17,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import List, Optional
-from pyRAPL import Sensor, Device
-import pyRAPL
+import pymongo
+
+from pyRAPL.outputs import BufferedOutput
 
 
-def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
+class MongoOutput(BufferedOutput):
     """
-    Configure which device and CPU socket should be monitored by pyRAPL
+    Store the recorded measure in a MongoDB database
 
-    This function must be called before using any other pyRAPL functions
+    This instance act as a buffer. The method ``add`` add data to the buffer and the method ``save`` store each data
+    in the buffer in the MongoDB database. After that, the buffer is flushed
 
-    :param devices: list of monitored devices if None, all the available devices on the machine will be monitored
-
-    :param socket_ids: list of monitored sockets, if None, all the available socket on the machine will be monitored
-
-    :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about the given device in parameter
-
-    :raise PyRAPLBadSocketIdException: if the given socket in parameter doesn't exist
+    :param uri: uri used to connect to the mongoDB instance
+    :param database: database name to store the data
+    :param collection: collection name to store the data
     """
-    pyRAPL._sensor = Sensor(devices=devices, socket_ids=socket_ids)
+    def __init__(self, uri: str, database: str, collection: str):
+        """
+        Export the results to a collection in a mongo database
+        """
+        BufferedOutput.__init__(self)
+        self._client = pymongo.MongoClient(uri)
+        self._db = self._client[database]
+        self._collection = self._db[collection]
+
+    def _output_buffer(self):
+        """
+        Store all the data contained in the buffer
+
+        :param data: data to output
+        """
+        self._collection.insert_many(self._buffer)

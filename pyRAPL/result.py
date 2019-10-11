@@ -17,23 +17,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import List, Optional
-from pyRAPL import Sensor, Device
-import pyRAPL
+from typing import Optional, List
+from dataclasses import dataclass
 
 
-def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
+@dataclass(frozen=True)
+class Result:
     """
-    Configure which device and CPU socket should be monitored by pyRAPL
+    A data class to represent the energy measures
 
-    This function must be called before using any other pyRAPL functions
-
-    :param devices: list of monitored devices if None, all the available devices on the machine will be monitored
-
-    :param socket_ids: list of monitored sockets, if None, all the available socket on the machine will be monitored
-
-    :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about the given device in parameter
-
-    :raise PyRAPLBadSocketIdException: if the given socket in parameter doesn't exist
+    :var label: measurement label
+    :vartype label: str
+    :var timestamp: measurement's beginning time (expressed in seconds since the epoch)
+    :vartype timestamp: float
+    :var duration:  measurement's duration (in seconds)
+    :vartype duration: float
+    :var pkg: list of the CPU power consumption -expressed in Joules- (one value for each socket) if None, no CPU power consumption was recorded
+    :vartype pkg: Optional[List[float]]
+    :var dram: list of the RAM power consumption -expressed in seconds- (one value for each socket) if None, no RAM power consumption was recorded
+    :vartype dram: Optional[List[float]]
     """
-    pyRAPL._sensor = Sensor(devices=devices, socket_ids=socket_ids)
+    label: str
+    timestamp: float
+    duration: float
+    pkg: Optional[List[float]] = None
+    dram: Optional[List[float]] = None
