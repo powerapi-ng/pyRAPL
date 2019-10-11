@@ -18,44 +18,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import os
-from typing import List
 
 from pyRAPL import Result
-from pyRAPL.outputs import Output
+from pyRAPL.outputs import BufferedOutput
 
-@Output.register
-class CSVOutput:
 
-    def __init__(self, filename):
-        self.filename = filename
-        self._header = ",".join(list(Result.__annotations__.keys()) + ["socket"]) + "\n"
-        self._data = []
+class CSVOutput(BufferedOutput):
+    """
+    Write the recorded measure in csv format on a file
 
-    def add(self, result):
-        x = dict(vars(result))
-        x['timestamp'] = x['timestamp']
-        for i in range(len(result.pkg)):
-            x['socket'] = i
-            x['pkg'] = result.pkg[i]
-            x['dram'] = result.dram[i]
-            self._data.append(x.copy())
+    if the file already exists, the result will be append to the end of the file, otherwise it will create a new file.
 
-    @property
-    def data(self) -> List:
-        return self._data
+    This instance act as a buffer. The method ``add`` add data to the buffer and the method ``save`` append each data
+    in the buffer at the end of the csv file. After that, the buffer is flushed
 
-    def save(self):
-        """"
-        Save the curent data in a csv file . If the file exists it will append the results in the end and the file
-        otherwise it will create a new file.
-        After saving. the data will be removed from the RAM memeory
+    :param filename: file's name  were the result will be written
+    :param separator: character used to separate columns in the csv file
+    """
+    def __init__(self, filename: str, separator: str = ','):
+        BufferedOutput.__init__(self)
+        self._separator = ','
+        self._header = separator.join(list(Result.__annotations__.keys()) + ['socket']) + '\n'
+        self._buffer = []
+        self._filename = filename
+
+    def _output_buffer(self):
         """
-        cond = os.path.exists(self.filename)
-        with open(self.filename, "a+") as f:
-            if not cond:
-                f.writelines(self._header)
-            for i in self._data:
-                s = ",".join([str(j) for j in i.values()]) + "\n"
-                f.writelines(s)
-        del self._data
-        self._data = []
+        Append the data at the end of the csv file
+        :param data: data to write
+        """
+        file_exists = os.path.exists(self._filename)
+        with open(self._filename, 'a+') as csv_file:
+            if not file_exists:
+                csv_file.writelines(self._header)
+            for data in self._buffer:
+                line = self._separator.join([str(column) for column in data.values()]) + '\n'
+                csv_file.writelines(line)

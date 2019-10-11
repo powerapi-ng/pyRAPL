@@ -17,52 +17,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import pymongo
+
+from pyRAPL.outputs import BufferedOutput
 
 
+class MongoOutput(BufferedOutput):
+    """
+    Store the recorded measure in a MongoDB database
 
+    This instance act as a buffer. The method ``add`` add data to the buffer and the method ``save`` store each data
+    in the buffer in the MongoDB database. After that, the buffer is flushed
 
-from typing import List
-import asyncio
-
-
-
-import pymongo 
-
-from pyRAPL import Result
-from pyRAPL.outputs import Output
-
-@Output.register
-class MongoOutput:
-        
-    def __init__(self,serveraddr, serverport,database,collection):
+    :param uri: uri used to connect to the mongoDB instance
+    :param database: database name to store the data
+    :param collection: collection name to store the data
+    """
+    def __init__(self, uri: str, database: str, collection: str):
         """
-        export the results to a collection in a mongo database 
-
+        Export the results to a collection in a mongo database
         """
-        self._client = pymongo.MongoClient(serveraddr, serverport)
-        self._db=self._client[database]
+        BufferedOutput.__init__(self)
+        self._client = pymongo.MongoClient(uri)
+        self._db = self._client[database]
         self._collection = self._db[collection]
-        # self.header = ",".join(list(Result.__annotations__.keys()) + ["socket"]) + "\n"
-        self._data = []
 
-    def add(self,result):
-        x = dict(vars(result))
-        x['timestamp'] = x['timestamp']
-        for i in range(len(result.pkg)):
-            x['socket'] = i
-            x['pkg'] = result.pkg[i]
-            x['dram'] = result.dram[i]
-            self._data.append(x.copy())
-
-    @property
-    def data(self) -> List:
-        return self._data
-    
-    def save(self):
-        """"
-        save data into a mongo database 
-        After saving. the data will be removed from the RAM memeory
+    def _output_buffer(self):
         """
-        self._collection.insert_many(self.data)
-        del self._data
-        self._data = []
+        Store all the data contained in the buffer
+
+        :param data: data to output
+        """
+        self._collection.insert_many(self._buffer)
