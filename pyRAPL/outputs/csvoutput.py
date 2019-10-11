@@ -33,24 +33,30 @@ class CSVOutput(BufferedOutput):
     in the buffer at the end of the csv file. After that, the buffer is flushed
 
     :param filename: file's name  were the result will be written
+
     :param separator: character used to separate columns in the csv file
+
+    :param append: Turn it to False to delete file if it already exist.
     """
-    def __init__(self, filename: str, separator: str = ','):
+    def __init__(self, filename: str, separator: str = ',', append: bool = True):
         BufferedOutput.__init__(self)
-        self._separator = ','
-        self._header = separator.join(list(Result.__annotations__.keys()) + ['socket']) + '\n'
+        self._separator = separator
         self._buffer = []
         self._filename = filename
+
+        # Create file with header if it not exist or if append is False
+        if not os.path.exists(self._filename) or not append:
+            header = separator.join(list(Result.__annotations__.keys()) + ['socket']) + '\n'
+
+            with open(self._filename, 'w+') as csv_file:
+                csv_file.writelines(header)
 
     def _output_buffer(self):
         """
         Append the data at the end of the csv file
         :param data: data to write
         """
-        file_exists = os.path.exists(self._filename)
         with open(self._filename, 'a+') as csv_file:
-            if not file_exists:
-                csv_file.writelines(self._header)
             for data in self._buffer:
                 line = self._separator.join([str(column) for column in data.values()]) + '\n'
                 csv_file.writelines(line)
