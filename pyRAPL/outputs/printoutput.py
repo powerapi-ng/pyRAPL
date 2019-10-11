@@ -23,10 +23,50 @@ from pyRAPL import Result
 from pyRAPL.outputs import Output
 
 
+def print_energy(energy):
+    s = ""
+    for i in range(len(energy)):
+        if isinstance(i, float):
+            s = s + f"\n\tsocket {i} : {energy[i]: 10.4}"
+        else:
+            s = s + f"\n\tsocket {i} : {energy[i]}"
+    return s
+
+
 class PrintOutput(Output):
     """
     Output that print data on standard output
+
+    :param raw: if True, print the raw result class to standard output.
+                Otherwise, print a fancier representation of result
     """
+
+    def __init__(self, raw: bool = False):
+        Output.__init__(self)
+
+        self._raw = raw
+
+    def _format_output(self, result):
+        if self._raw:
+            return str(result)
+        else:
+            s = f"""
+            Label : {result.label}
+            Begin : {time.ctime(result.timestamp)}
+            Duration : {result.duration} s
+            """
+            if result.pkg is not None:
+                s += f"""
+                -------------------------------
+                PKG : {print_energy(result.pkg)}
+                """
+            if result.dram is not None:
+                s += f"""
+                -------------------------------
+                DRAM : {print_energy(result.dram)}
+                """
+                s += """-------------------------------"""
+            return s
 
     def add(self, result: Result):
         """
@@ -34,29 +74,4 @@ class PrintOutput(Output):
 
         :param result: data to print
         """
-        def print_energy(energy):
-            s = ""
-            for i in range(len(energy)):
-                if isinstance(i, float):
-                    s = s + f"\n\tsocket {i} : {energy[i]: 10.4}"
-                else:
-                    s = s + f"\n\tsocket {i} : {energy[i]}"
-            return s
-
-        s = f"""
-        Label : {result.label}
-        Begin : {time.ctime(result.timestamp)}
-        Duration : {result.duration} s
-        """
-        if result.pkg is not None:
-            s += f"""
-            -------------------------------
-            PKG : {print_energy(result.pkg)}
-            """
-        if result.dram is not None:
-            s += f"""
-            -------------------------------
-            DRAM : {print_energy(result.dram)}
-            """
-        s += """-------------------------------"""
-        print(s)
+        print(self._format_output(result))
