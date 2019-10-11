@@ -1,4 +1,4 @@
-f# MIT License
+# MIT License
 # Copyright (c) 2019, INRIA
 # Copyright (c) 2019, University of Lille
 # All rights reserved.
