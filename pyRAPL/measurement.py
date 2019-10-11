@@ -34,7 +34,7 @@ def empty_energy_result(energy_result):
 
 class Measurement:
     """
-    measure the power consumption of devices on a bounded period
+    measure the energy consumption of devices on a bounded period
 
     Beginning and end of this period are given by calling ``begin()`` and ``end()`` methods
 
@@ -77,7 +77,7 @@ class Measurement:
 
     def export(self, output: Output = None):
         """
-        Export the power consumption measure to a given output
+        Export the power consumption measures to a given output
 
         :param output: output that will handle the measure, if None, the default output will be used
         """
@@ -98,7 +98,7 @@ def measure(_func=None, *, output: Output = None):
     """
     Measure the energy consumption of monitored devices during the execution of the decorated function
 
-    :param output: Output instance that will receive the power consummation data
+    :param output: output instance that will receive the power consummation data
     """
 
     def decorator_measure_energy(func):

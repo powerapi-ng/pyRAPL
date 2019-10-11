@@ -26,15 +26,14 @@ def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]
     """
     Configure which device and CPU socket should be monitored by pyRAPL
 
-    This function must be called before using any other pyRAPL function
+    This function must be called before using any other pyRAPL functions
 
-    :param devices: list of monitored devices if None, all the devices available on the machine will be monitored
+    :param devices: list of monitored devices if None, all the available devices on the machine will be monitored
 
-    :param socket_ids: list of monitored sockets, if None, all the socket available on the machine will be monitored
+    :param socket_ids: list of monitored sockets, if None, all the available socket on the machine will be monitored
 
-    :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about a device given in
-                                              parameter
+    :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about the given device in parameter
 
-    :raise PyRAPLBadSocketIdException: if one socket given in parameter doesn't exists
+    :raise PyRAPLBadSocketIdException: if the given socket in parameter doesn't exist
     """
     pyRAPL._sensor = Sensor(devices=devices, socket_ids=socket_ids)

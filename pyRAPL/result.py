@@ -28,15 +28,13 @@ class Result:
 
     :var label: measurement label
     :vartype label: str
-    :var timestamp: measurement's beginning time
+    :var timestamp: measurement's beginning time (expressed in seconds since the epoch)
     :vartype timestamp: float
-    :var duration:  measurement's duration
+    :var duration:  measurement's duration (in seconds)
     :vartype duration: float
-    :var pkg: list of the CPU power consumption (one value for each socket) if None, no CPU power consumption was
-              recorded
+    :var pkg: list of the CPU power consumption -expressed in Joules- (one value for each socket) if None, no CPU power consumption was recorded
     :vartype pkg: Optional[List[float]]
-    :var dram: list of the RAM power consumption (one value for each socket) if None, no RAM power consumption was
-               recorded
+    :var dram: list of the RAM power consumption -expressed in seconds- (one value for each socket) if None, no RAM power consumption was recorded
     :vartype dram: Optional[List[float]]
     """
     label: str

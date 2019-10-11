@@ -27,7 +27,7 @@ class BufferedOutput(Output):
     """
     Use a buffer to batch the output process
 
-    The method ``add`` add data to the buffer and the method ``save`` output each data in the buffer. After that, the
+    The method ``add`` add data to the buffer and the method ``save`` outputs each data in the buffer. After that, the
     buffer is flushed
 
     Implement the abstract method ``_output_buffer`` to define how to output buffered data

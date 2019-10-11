@@ -22,7 +22,7 @@ from enum import IntEnum
 
 class Device(IntEnum):
     """
-    Device that could be monitored by pyRAPL
+    Device that can be monitored by pyRAPL
 
     Device.PKG : to monitor the CPU power consumption
 
