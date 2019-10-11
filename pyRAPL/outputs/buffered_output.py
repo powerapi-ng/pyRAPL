@@ -17,41 +17,62 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import time
-
-import pandas
+from typing import List
 
 from pyRAPL import Result
 from pyRAPL.outputs import Output
 
 
-class DataFrameOutput(Output):
+class BufferedOutput(Output):
     """
-    Append recorded data to a pandas Dataframe
+    Use a buffer to batch the output process
+
+    The method ``add`` add data to the buffer and the method ``save`` output each data in the buffer. After that, the
+    buffer is flushed
+
+    Implement the abstract method ``_output_buffer`` to define how to output buffered data
     """
+
     def __init__(self):
         Output.__init__(self)
-        self._data_frame = pandas.DataFrame(columns=list(Result.__annotations__.keys()) + ["socket"])
+        self._buffer = []
 
     def add(self, result):
         """
-        Append recorded data to the pandas Dataframe
+        Add the given data to the buffer
 
-        :param result: data to add to the dataframe
+        :param result: data that must be added to the buffer
         """
         x = dict(vars(result))
-        x['timestamp'] = time.ctime(x['timestamp'])
+        x['timestamp'] = x['timestamp']
         for i in range(len(result.pkg)):
             x['socket'] = i
             x['pkg'] = result.pkg[i]
             x['dram'] = result.dram[i]
-            self._data_frame = self._data.append(x, ignore_index=True)
+            self._buffer.append(x.copy())
 
     @property
-    def data(self) -> pandas.DataFrame:
+    def buffer(self) -> List[Result]:
         """
-        Return the dataframe that contains the recorded data
+        Return the buffer content
 
-        :return: the dataframe
+        :return: a list of all the ``Result`` instances contained in the buffer
         """
-        return self._data_frame
+        return self._buffer
+
+    def _output_buffer(self):
+        """
+        Abstract method
+
+        Output all the data contained in the buffer
+
+        :param data: data to output
+        """
+        raise NotImplementedError()
+
+    def save(self):
+        """
+        Output each data in the buffer and empty the buffer
+        """
+        self._output_buffer()
+        self._buffer = []
