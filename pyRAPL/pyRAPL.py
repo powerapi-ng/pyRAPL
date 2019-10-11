@@ -24,14 +24,17 @@ import pyRAPL
 
 def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
     """
-    Configure the pyRAPL sensor
-    :param devices: list of device to get power consumption if None, all the devices available on the machine will
-                    be monitored
-    :param socket_ids: if None, the API will get the power consumption of the whole machine otherwise, it will
-                       get the power consumption of the devices on the given socket package
+    Configure which device and CPU socket should be monitored by pyRAPL
+
+    This function must be called before using any other pyRAPL function
+
+    :param devices: list of monitored devices if None, all the devices available on the machine will be monitored
+
+    :param socket_ids: list of monitored sockets, if None, all the socket available on the machine will be monitored
+
     :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about a device given in
                                               parameter
-    :raise PyRAPLBadSocketIdException: if the sensor can't get energy information about a device given in
-                                       parameter
+
+    :raise PyRAPLBadSocketIdException: if one socket given in parameter doesn't exists
     """
     pyRAPL._sensor = Sensor(devices=devices, socket_ids=socket_ids)

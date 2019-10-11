@@ -17,6 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from pyRAPL import Device
+
 
 class PyRAPLException(Exception):
     """Parent class of all PyRAPL exception
@@ -24,7 +26,7 @@ class PyRAPLException(Exception):
 
 
 class PyRAPLNoEnergyConsumptionRecordedException(PyRAPLException):
-    """Exception raised when a function recorded_energy() is executed without stoping consumption recording before
+    """Exception raised when a function recorded_energy() is executed without stopping consumption recording before
     """
 
 
@@ -35,8 +37,11 @@ class PyRAPLNoEnergyConsumptionRecordStartedException(PyRAPLException):
 class PyRAPLCantRecordEnergyConsumption(PyRAPLException):
     """Exception raised when starting recording power consumption for a device but no power consumption metric is
     available for this device
+
+    :var device: device that couldn't be monitored (if None, Any device on the machine could be monitored)
+    :vartype device: Device
     """
-    def __init__(self, device):
+    def __init__(self, device: Device):
         PyRAPLException.__init__(self)
         self.device = device
 
@@ -50,9 +55,12 @@ class PyRAPLCantInitDeviceAPI(PyRAPLException):
 
 class PyRAPLBadSocketIdException(PyRAPLException):
     """
-    Exception raised when trying to initialise a DeviceAPI on a socket that doesn't exist on the machine
+    Exception raised when trying to initialise PyRAPL on a socket that doesn't exist on the machine
+
+    :var socket_id: socket that doesn't exist
+    :vartype socket_id: int
     """
 
-    def __init__(self, socket_id):
+    def __init__(self, socket_id: int):
         PyRAPLException.__init__(self)
         self.socket_id = socket_id

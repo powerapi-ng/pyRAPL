@@ -1,4 +1,4 @@
-# MIT License
+f# MIT License
 # Copyright (c) 2019, INRIA
 # Copyright (c) 2019, University of Lille
 # All rights reserved.
@@ -17,31 +17,46 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from pyRAPL import Result 
-from pyRAPL.outputs import Output
 import time
 
-@Output.register
-class PrintOutput:
+from pyRAPL import Result
+from pyRAPL.outputs import Output
+
+
+class PrintOutput(Output):
     """
-        Implementation of the Abstract class Output that print the results
+    Output that print data on standard output
     """
 
-    def add (self, result: Result):
+    def add(self, result: Result):
+        """
+        print result on standard output
+
+        :param result: data to print
+        """
         def print_energy(energy):
             s = ""
             for i in range(len(energy)):
-                s = s + f"\n\tsocket {i} : {energy[i]: 10.4}"
+                if isinstance(i, float):
+                    s = s + f"\n\tsocket {i} : {energy[i]: 10.4}"
+                else:
+                    s = s + f"\n\tsocket {i} : {energy[i]}"
             return s
 
         s = f"""
         Label : {result.label}
         Begin : {time.ctime(result.timestamp)}
         Duration : {result.duration} s
-        -------------------------------
-        PKG : {print_energy(result.pkg)}
-        -------------------------------
-        DRAM : {print_energy(result.dram)}
-        -------------------------------
         """
+        if result.pkg is not None:
+            s += f"""
+            -------------------------------
+            PKG : {print_energy(result.pkg)}
+            """
+        if result.dram is not None:
+            s += f"""
+            -------------------------------
+            DRAM : {print_energy(result.dram)}
+            """
+        s += """-------------------------------"""
         print(s)
