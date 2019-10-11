@@ -17,19 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-import abc
-
 from pyRAPL import Result
 
 
-class Output(abc.ABC):
+class Output:
     """
-    Abstract class that represent an output handler for the Measurement class
+    Abstract class that represent an output handler for the `Measurement` class
     """
 
-    @abc.abstractmethod
     def add(self, result: Result):
         """
-        Handle the object Results
+        Handle the object `Result`
+
+        :param result: data to handle
         """
+        raise NotImplementedError()

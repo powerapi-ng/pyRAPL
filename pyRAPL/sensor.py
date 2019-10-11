@@ -22,12 +22,16 @@ from typing import List, Optional
 from pyRAPL import Device, DeviceAPIFactory, PyRAPLCantInitDeviceAPI, PyRAPLCantRecordEnergyConsumption
 from pyRAPL import PyRAPLBadSocketIdException
 
+
 class SubstractableList(list):
-    
+    """
+    Substract each element of a list to another list except if they are negative numbers
+    """
     def __sub__(self, other):
         if len(other) != len(self):
             raise ValueError("List are not of the same length")
-        return [a - b for a, b in zip(self, other)]
+        return [a - b if a >= 0 and b >= 0 else -1 for a, b in zip(self, other)]
+
 
 class Sensor:
     """

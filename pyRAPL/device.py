@@ -21,5 +21,12 @@ from enum import IntEnum
 
 
 class Device(IntEnum):
+    """
+    Device that could be monitored by pyRAPL
+
+    Device.PKG : to monitor the CPU power consumption
+
+    Device.DRAM : to monitor the RAM power consumption
+    """
     PKG = 0
     DRAM = 1

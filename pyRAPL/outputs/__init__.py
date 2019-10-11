@@ -17,27 +17,45 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""
+This module contains class that will be used by the ``measure`` decorator or the ``Measurement.export`` method to export
+recorded measurement
 
+example with the  ``measure decorator``::
 
-# from  exception import ImportError
+    output_instance = pyRAPL.outputs.XXXOutput(...)
 
-import logging 
+    @pyRAPL.measure(output=output_instance)
+    def foo():
+        ...
 
-from .output  import Output
+example with the ``Measurement.export`` function::
+
+    measure = pyRAPL.Measurement('label')
+    ...
+    output_instance = pyRAPL.outputs.XXXOutput(...)
+    measure.export(output_instance)
+
+You can define your one output by inherit from the ``Output`` class and implements the ``add`` method.
+This method will receive the measured power consumption data as a ``Result`` instance and must handle it.
+
+For example, the ``PrintOutput.add`` method will print the ``Result`` instance.
+"""
+import logging
+
+from .output import Output
+from .buffered_output import BufferedOutput
 from .printoutput import PrintOutput
 from .csvoutput import CSVOutput
-
 
 try:
     from .mongooutput import MongoOutput
 
-except ImportError as e  : 
-    print(e)
+except ImportError:
     logging.error("imports error \n You need to install pymongo>=3.9.0 in order to use MongoOutput ")
 
-try: 
-    from .dataframeoutput import DataFrameOutput 
+try:
+    from .dataframeoutput import DataFrameOutput
 
-except ImportError as e  : 
-    print(e)
+except ImportError:
     logging.error("imports error \n  You need to install pandas>=0.25.1 in order to use DataFrameOutput ")
