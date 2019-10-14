@@ -136,7 +136,7 @@ def test_init_psys_files_two_sockets(fs):
 
 def test_init_one_file_one_socket(fs_one_socket, device_api_param):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0
     The filesystem contains a rapl file for the socket 0
     Test if:
       - the attribute DeviceAPI._sys_files is a list of length 1
@@ -150,7 +150,7 @@ def test_init_one_file_one_socket(fs_one_socket, device_api_param):
 
 def test_init_two_files_one_socket(fs_two_socket, device_api_param):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the attribute DeviceAPI._sys_files is a list of length 1
@@ -164,7 +164,7 @@ def test_init_two_files_one_socket(fs_two_socket, device_api_param):
 
 def test_init_two_files_last_socket(fs_two_socket, device_api_param):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 1
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 1
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the attribute DeviceAPI._sys_files is a list of length 1
@@ -180,7 +180,7 @@ def test_init_two_files_last_socket(fs_two_socket, device_api_param):
 
 def test_init_one_file_two_socket(fs_one_socket, device_api_param):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0 and 1
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0 and 1
     The filesystem contains a rapl file for the socket 0
     Test if:
       - a PyRAPLBadSocketIdException is raised
@@ -191,7 +191,7 @@ def test_init_one_file_two_socket(fs_one_socket, device_api_param):
 
 def test_init_two_files_two_socket(fs_two_socket, device_api_param):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0 and 1
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0 and 1
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the attribute DeviceAPI._sys_files is a list of length 2
@@ -208,7 +208,7 @@ def test_init_two_files_two_socket(fs_two_socket, device_api_param):
 
 def test_init_two_files_all_socket(fs_two_socket, device_api_param):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0 and 1
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0 and 1
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the attribute DeviceAPI._sys_files is a list of length 2
@@ -224,7 +224,7 @@ def test_init_two_files_all_socket(fs_two_socket, device_api_param):
 
 def test_init_dram_api_without_dram_files(fs_one_socket_no_dram):
     """
-    create a DramAPI instance to measure power consumption of device on socket 0
+    create a DramAPI instance to measure energy consumption of device on socket 0
     The file system contains a rapl file for the socket 0 but no dram support
     Test if:
       - a PyRAPLCantInitDeviceAPI is raised
@@ -238,12 +238,12 @@ def test_init_dram_api_without_dram_files(fs_one_socket_no_dram):
 ##########
 def test_energy_one_file_socket_0(device_api_param, fs_one_socket):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0
-    use the energy function to get the power consumption
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0
+    use the energy function to get the energy consumption
     The filesystem contains a rapl file for the socket 0
     Test if:
       - the returned value is a tuple of length 1 containing float
-      - the first value of the tuple is the power consumption of the corresponding device on socket 0
+      - the first value of the tuple is the energy consumption of the corresponding device on socket 0
     """
     device_api = device_api_param.device_class()
 
@@ -257,12 +257,12 @@ def test_energy_one_file_socket_0(device_api_param, fs_one_socket):
 
 def test_energy_two_files_socket_0(device_api_param, fs_two_socket):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0
-    use the energy function to get the power consumption
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0
+    use the energy function to get the energy consumption
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the returned value is a tuple of length 1 containing float
-      - the first value of the tuple is the power consumption of the corresponding device on socket 0
+      - the first value of the tuple is the energy consumption of the corresponding device on socket 0
     """
     device_api = device_api_param.device_class(socket_ids=[0])
 
@@ -276,13 +276,13 @@ def test_energy_two_files_socket_0(device_api_param, fs_two_socket):
 
 def test_energy_two_files_socket_1(device_api_param, fs_two_socket):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 1
-    use the energy function to get the power consumption
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 1
+    use the energy function to get the energy consumption
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the returned value is a tuple of length 2 containing float
       - the first value of the tuple is -1
-      - the second value of the tuple is the power consumption of the corresponding device on socket 1
+      - the second value of the tuple is the energy consumption of the corresponding device on socket 1
     """
     device_api = device_api_param.device_class(socket_ids=[1])
 
@@ -297,13 +297,13 @@ def test_energy_two_files_socket_1(device_api_param, fs_two_socket):
 
 def test_energy_two_files_socket_0_1(device_api_param, fs_two_socket):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 0 and 1
-    use the energy function to get the power consumption
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 0 and 1
+    use the energy function to get the energy consumption
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the returned value is a tuple of length 2 containing float
-      - the first value of the tuple is the power consumption of the corresponding device on socket 0
-      - the second value of the tuple is the power consumption of the corresponding device on socket 1
+      - the first value of the tuple is the energy consumption of the corresponding device on socket 0
+      - the second value of the tuple is the energy consumption of the corresponding device on socket 1
     """
     device_api = device_api_param.device_class(socket_ids=[0, 1])
 
@@ -319,13 +319,13 @@ def test_energy_two_files_socket_0_1(device_api_param, fs_two_socket):
 
 def test_energy_two_files_socket_all(device_api_param, fs_two_socket):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on all socket
-    use the energy function to get the power consumption
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on all socket
+    use the energy function to get the energy consumption
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the returned value is a tuple of length 2 containing float
-      - the first value of the tuple is the power consumption of the corresponding device on socket 0
-      - the second value of the tuple is the power consumption of the corresponding device on socket 1
+      - the first value of the tuple is the energy consumption of the corresponding device on socket 0
+      - the second value of the tuple is the energy consumption of the corresponding device on socket 1
     """
     device_api = device_api_param.device_class()
 
@@ -341,13 +341,13 @@ def test_energy_two_files_socket_all(device_api_param, fs_two_socket):
 
 def test_energy_two_files_socket_1_0(device_api_param, fs_two_socket):
     """
-    create a DeviceAPI (PkgAPI and DramAPI) instance to measure power consumption of device on socket 1 and 0
-    use the energy function to get the power consumption
+    create a DeviceAPI (PkgAPI and DramAPI) instance to measure energy consumption of device on socket 1 and 0
+    use the energy function to get the energy consumption
     The filesystem contains a rapl file for the socket 0 and 1
     Test if:
       - the returned value is a tuple of length 2 containing float
-      - the first value of the tuple is the power consumption of the corresponding device on socket 0
-      - the second value of the tuple is the power consumption of the corresponding device on socket 1
+      - the first value of the tuple is the energy consumption of the corresponding device on socket 0
+      - the second value of the tuple is the energy consumption of the corresponding device on socket 1
     """
     device_api = device_api_param.device_class(socket_ids=[1, 0])
 

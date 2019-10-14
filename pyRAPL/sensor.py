@@ -35,15 +35,15 @@ class SubstractableList(list):
 
 class Sensor:
     """
-    Global singleton that return global power consumption about monitored devices
+    Global singleton that return global energy consumption about monitored devices
     """
 
     def __init__(self, devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
         """
-        :param devices: list of device to get power consumption if None, all the devices available on the machine will
+        :param devices: list of device to get energy consumption if None, all the devices available on the machine will
                         be monitored
-        :param socket_ids: if None, the API will get the power consumption of the whole machine otherwise, it will
-                           get the power consumption of the devices on the given socket package
+        :param socket_ids: if None, the API will get the energy consumption of the whole machine otherwise, it will
+                           get the energy consumption of the devices on the given socket package
         :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about a device given in
                                                   parameter
         :raise PyRAPLBadSocketIdException: if the sensor can't get energy information about a device given in
@@ -71,8 +71,8 @@ class Sensor:
 
     def energy(self) -> SubstractableList:
         """
-        get the power consumption of all the monitored devices
-        :return: a tuple containing the power consumption of each device for each socket. The tuple structure is :
+        get the energy consumption of all the monitored devices
+        :return: a tuple containing the energy consumption of each device for each socket. The tuple structure is :
                  (pkg energy socket 0, dram energy socket 0, ..., pkg energy socket N, dram energy socket N)
         """
         result = SubstractableList([-1, -1] * (self._socket_ids[-1] + 1))

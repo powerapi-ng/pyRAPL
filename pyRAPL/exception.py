@@ -35,7 +35,7 @@ class PyRAPLNoEnergyConsumptionRecordStartedException(PyRAPLException):
 
 
 class PyRAPLCantRecordEnergyConsumption(PyRAPLException):
-    """Exception raised when starting recording power consumption for a device but no power consumption metric is
+    """Exception raised when starting recording energy consumption for a device but no energy consumption metric is
     available for this device
 
     :var device: device that couldn't be monitored (if None, Any device on the machine could be monitored)

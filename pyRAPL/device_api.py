@@ -53,13 +53,13 @@ def get_socket_ids() -> List[int]:
 
 class DeviceAPI:
     """
-    API to read energy power consumption from sysfs
+    API to read energy consumption from sysfs
     """
 
     def __init__(self, socket_ids: Optional[List[int]] = None):
         """
-        :param int socket_ids: if None, the API will get the power consumption of the whole machine otherwise, it will
-                               get the power consumption of the device on the given socket package
+        :param int socket_ids: if None, the API will get the energy consumption of the whole machine otherwise, it will
+                               get the energy consumption of the device on the given socket package
         :raise PyRAPLCantInitDeviceAPI: the machine where is initialised the DeviceAPI have no rapl interface for the
                                         target device
         :raise PyRAPLBadSocketIdException: the machine where is initialised the DeviceAPI has no the requested socket
@@ -117,9 +117,9 @@ class DeviceAPI:
 
     def energy(self) -> Tuple[float, ...]:
         """
-        Get the power consumption of the device since the last CPU reset
-        :return float tuple: a tuple containing the power consumption (in J) the device on each socket
-                             the Nth value of the tuple correspond to the power consumption of the device on the Nth
+        Get the energy consumption of the device since the last CPU reset
+        :return float tuple: a tuple containing the energy consumption (in J) the device on each socket
+                             the Nth value of the tuple correspond to the energy consumption of the device on the Nth
                              socket
         """
         result = [-1] * (self._socket_ids[-1] + 1)

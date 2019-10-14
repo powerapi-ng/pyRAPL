@@ -7,12 +7,12 @@
 # About
 pyRAPL is a toolkit that measures the energy consumption of a machine during the execution of a python code.
 
-pyRAPL uses the intel "Running Average Power Limit" (RAPL) technology that estimate global power consumption of internal devices. This technology is only available on Intel CPU with Sandy Bridge architecture or higher.
+pyRAPL uses the intel "Running Average Power Limit" (RAPL) technology that estimate power consumption of internal devices. This technology is only available on Intel CPU with Sandy Bridge architecture or higher.
 
 pyRAPL can measure the energy consumption of the following devices :
 
  - CPU socket package 
- - RAM (only on server CPU)
+ - RAM (only on Xeon CPU architecture)
 
 # Installation
 

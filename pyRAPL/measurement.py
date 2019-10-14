@@ -40,7 +40,7 @@ class Measurement:
 
     :param label: measurement label
 
-    :param output: default output to export the recorded power consumption. If None, the PrintOutput will be used
+    :param output: default output to export the recorded energy consumption. If None, the PrintOutput will be used
     """
 
     def __init__(self, label: str, output: Output = None):
@@ -77,7 +77,7 @@ class Measurement:
 
     def export(self, output: Output = None):
         """
-        Export the power consumption measures to a given output
+        Export the energy consumption measures to a given output
 
         :param output: output that will handle the measure, if None, the default output will be used
         """

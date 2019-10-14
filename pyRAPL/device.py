@@ -24,9 +24,9 @@ class Device(IntEnum):
     """
     Device that can be monitored by pyRAPL
 
-    Device.PKG : to monitor the CPU power consumption
+    Device.PKG : to monitor the CPU energy consumption
 
-    Device.DRAM : to monitor the RAM power consumption
+    Device.DRAM : to monitor the RAM energy consumption
     """
     PKG = 0
     DRAM = 1

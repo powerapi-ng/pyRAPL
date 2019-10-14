@@ -37,7 +37,7 @@ example with the ``Measurement.export`` function::
     measure.export(output_instance)
 
 You can define your one output by inherit from the ``Output`` class and implements the ``add`` method.
-This method will receive the measured power consumption data as a ``Result`` instance and must handle it.
+This method will receive the measured energy consumption data as a ``Result`` instance and must handle it.
 
 For example, the ``PrintOutput.add`` method will print the ``Result`` instance.
 """

@@ -172,7 +172,7 @@ def test_energy_two_socket(fs_two_socket, sensor_param):
 def test_energy_monitor_socket_1_two_socket(fs_two_socket, sensor_param_monitor_socket_1):
     """
     Create a sensor with to monitor package and dram device on socket 1
-    use the energy function to get the power consumption of the monitored devices
+    use the energy function to get the energy consumption of the monitored devices
     The machine contains two sockets
     Test:
       - return value of the function

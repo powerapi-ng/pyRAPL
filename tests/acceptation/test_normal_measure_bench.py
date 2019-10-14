@@ -33,7 +33,7 @@ def measurable_function(a):
 
 def test_nomal_measure_bench(fs_one_socket):
     """
-    Test to measure the power consumption of a function using the Measurement class
+    Test to measure the energy consumption of a function using the Measurement class
 
     - launch the measure
     - write a new value to the RAPL power measurement api file
@@ -41,7 +41,7 @@ def test_nomal_measure_bench(fs_one_socket):
     - end the measure
 
     Test if:
-      - the power consumption measured is the delta between the first and the last value in the RAPL power measurement
+      - the energy consumption measured is the delta between the first and the last value in the RAPL power measurement
         file
     """
     pyRAPL.setup()

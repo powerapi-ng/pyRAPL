@@ -29,7 +29,7 @@ POWER_CONSUMPTION_DRAM = 30000
 
 def test_decorator_measure(fs_one_socket):
     """
-    Test to measure the power consumption of a function using the measure decorator
+    Test to measure the energy consumption of a function using the measure decorator
 
     - decorate a function with the measure decorator and use a CSVOutput
     - launch the function
@@ -37,8 +37,8 @@ def test_decorator_measure(fs_one_socket):
 
     Test if:
       - the file contains 1 line + 1 header
-      - a line contains the DRAM power consumption
-      - a line contains the PKG power consumption
+      - a line contains the DRAM energy consumption
+      - a line contains the PKG energy consumption
     """
     pyRAPL.setup()
 
