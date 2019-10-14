@@ -1,0 +1,4 @@
+sphinx-autodoc-typehints
+sphinx-rtd-theme
+pymongo
+pandas
