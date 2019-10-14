@@ -112,7 +112,7 @@ You can also use an output to handle this results, for example with the csv outp
 
 ## About
 
-PyRAPL is an open-source project developed by the [Spirals research group](https://team.inria.fr/spirals) (University of Lille and Inria) that take part of the [powerapi](powerapi.org) project.
+PyRAPL is an open-source project developed by the [Spirals research group](https://team.inria.fr/spirals) (University of Lille and Inria) that take part of the [powerapi](http://powerapi.org) project.
 
 The documentation is available [here](https://pyrapl.readthedocs.io/en/latest/).
 
