@@ -42,7 +42,7 @@ class PrintOutput(Output):
     """
 
     def __init__(self, raw: bool = False):
-        Output.__init__(self)
+        Output.__init__(self)k
 
         self._raw = raw
 

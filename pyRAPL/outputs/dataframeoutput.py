@@ -45,7 +45,7 @@ class DataFrameOutput(Output):
             x['socket'] = i
             x['pkg'] = result.pkg[i]
             x['dram'] = result.dram[i]
-            self._data_frame = self._data.append(x, ignore_index=True)
+            self._data_frame = self._data_frame.append(x, ignore_index=True)
 
     @property
     def data(self) -> pandas.DataFrame:
