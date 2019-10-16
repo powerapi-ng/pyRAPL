@@ -52,10 +52,10 @@ try:
     from .mongooutput import MongoOutput
 
 except ImportError:
-    logging.error("imports error \n You need to install pymongo>=3.9.0 in order to use MongoOutput ")
+    logging.warning("imports error \n You need to install pymongo>=3.9.0 in order to use MongoOutput ")
 
 try:
     from .dataframeoutput import DataFrameOutput
 
 except ImportError:
-    logging.error("imports error \n  You need to install pandas>=0.25.1 in order to use DataFrameOutput ")
+    logging.warning("imports error \n  You need to install pandas>=0.25.1 in order to use DataFrameOutput ")

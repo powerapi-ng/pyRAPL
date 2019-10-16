@@ -26,7 +26,7 @@ from pyRAPL.outputs import Output
 def print_energy(energy):
     s = ""
     for i in range(len(energy)):
-        if isinstance(i, float):
+        if isinstance(energy[i], float):
             s = s + f"\n\tsocket {i} : {energy[i]: 10.4}"
         else:
             s = s + f"\n\tsocket {i} : {energy[i]}"
@@ -53,7 +53,7 @@ class PrintOutput(Output):
             s = f"""
             Label : {result.label}
             Begin : {time.ctime(result.timestamp)}
-            Duration : {result.duration} s
+            Duration : {result.duration:10.4f} s
             """
             if result.pkg is not None:
                 s += f"""
