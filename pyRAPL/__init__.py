@@ -26,6 +26,6 @@ from pyRAPL.result import Result
 from pyRAPL.pyRAPL import setup
 from pyRAPL.measurement import Measurement, measure
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 _sensor = None
