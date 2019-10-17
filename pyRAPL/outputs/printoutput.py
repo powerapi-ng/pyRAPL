@@ -27,9 +27,9 @@ def print_energy(energy):
     s = ""
     for i in range(len(energy)):
         if isinstance(energy[i], float):
-            s = s + f"\n\tsocket {i} : {energy[i]: 10.4}"
+            s = s + f"\n\tsocket {i} : {energy[i]: 10.4f}"
         else:
-            s = s + f"\n\tsocket {i} : {energy[i]}"
+            s = s + f"\n\tsocket {i} : {energy[i]: 10.4f}"
     return s
 
 
@@ -42,7 +42,7 @@ class PrintOutput(Output):
     """
 
     def __init__(self, raw: bool = False):
-        Output.__init__(self)k
+        Output.__init__(self)
 
         self._raw = raw
 
@@ -50,22 +50,12 @@ class PrintOutput(Output):
         if self._raw:
             return str(result)
         else:
-            s = f"""
-            Label : {result.label}
-            Begin : {time.ctime(result.timestamp)}
-            Duration : {result.duration:10.4f} s
-            """
+            s = f"""Label : {result.label}\nBegin : {time.ctime(result.timestamp)}\nDuration : {result.duration:10.4f} s"""
             if result.pkg is not None:
-                s += f"""
-                -------------------------------
-                PKG : {print_energy(result.pkg)}
-                """
+                s += f"""\n-------------------------------\nPKG :{print_energy(result.pkg)}"""
             if result.dram is not None:
-                s += f"""
-                -------------------------------
-                DRAM : {print_energy(result.dram)}
-                """
-                s += """-------------------------------"""
+                s += f"""\n-------------------------------\nDRAM :{print_energy(result.dram)}"""
+                s += '\n-------------------------------'
             return s
 
     def add(self, result: Result):
