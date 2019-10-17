@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import time
 import pytest
 
 from pyRAPL import Result
@@ -31,8 +32,8 @@ def test_non_raw_output():
       the returned string is correct
     """
     result = Result('toto', 0, 0.23456, [0.34567], [0.45678, 0.56789])
-    correct_value = """Label : toto
-Begin : Thu Jan  1 01:00:00 1970
+    correct_value = f"""Label : toto
+Begin : {time.ctime(result.timestamp)}
 Duration :     0.2346 s
 -------------------------------
 PKG :
