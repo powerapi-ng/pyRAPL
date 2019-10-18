@@ -1,7 +1,7 @@
 # PyRAPL
 
 [![License: MIT](https://img.shields.io/pypi/l/pyRAPL)](https://spdx.org/licenses/MIT.html)
-[![Build Status](https://img.shields.io/circleci/project/github/powerapi-ng/powerapi.svg)](https://circleci.com/gh/powerapi-ng/powerapi)
+[![Build Status](https://img.shields.io/circleci/project/github/powerapi-ng/pyRAPL.svg)](https://circleci.com/gh/powerapi-ng/pyrapl)
 
 
 # About
