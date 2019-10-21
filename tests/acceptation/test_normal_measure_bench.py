@@ -17,23 +17,38 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import List, Optional
-from pyRAPL import Sensor, Device
+
+from tests.utils import fs_one_socket, write_new_energy_value, PKG_0_VALUE, DRAM_0_VALUE
+import time
 import pyRAPL
 
+POWER_CONSUMPTION_PKG = 20000
+POWER_CONSUMPTION_DRAM = 30000
 
-def setup(devices: Optional[List[Device]] = None, socket_ids: Optional[List[int]] = None):
+def measurable_function(a):
+    # Power consumption of the function
+    write_new_energy_value(POWER_CONSUMPTION_PKG, pyRAPL.Device.PKG, 0)
+    write_new_energy_value(POWER_CONSUMPTION_DRAM, pyRAPL.Device.DRAM, 0)
+    return 1 + a
+
+def test_nomal_measure_bench(fs_one_socket):
     """
-    Configure which device and CPU socket should be monitored by pyRAPL
+    Test to measure the energy consumption of a function using the Measurement class
 
-    This function must be called before using any other pyRAPL functions
+    - launch the measure
+    - write a new value to the RAPL power measurement api file
+    - launch a function
+    - end the measure
 
-    :param devices: list of monitored devices if None, all the available devices on the machine will be monitored
-
-    :param socket_ids: list of monitored sockets, if None, all the available socket on the machine will be monitored
-
-    :raise PyRAPLCantRecordEnergyConsumption: if the sensor can't get energy information about the given device in parameter
-
-    :raise PyRAPLBadSocketIdException: if the given socket in parameter doesn't exist
+    Test if:
+      - the energy consumption measured is the delta between the first and the last value in the RAPL power measurement
+        file
     """
-    pyRAPL._sensor = Sensor(devices=devices, socket_ids=socket_ids)
+    pyRAPL.setup()
+    measure = pyRAPL.Measurement('toto')
+    measure.begin()
+    measurable_function(1)
+    measure.end()
+
+    assert measure.result.pkg == [(POWER_CONSUMPTION_PKG - PKG_0_VALUE) / 1000000]
+    assert measure.result.dram == [(POWER_CONSUMPTION_DRAM - DRAM_0_VALUE) / 1000000]

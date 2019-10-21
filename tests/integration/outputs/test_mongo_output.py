@@ -1,6 +1,6 @@
 # MIT License
-# Copyright (c) 2018, INRIA
-# Copyright (c) 2018, University of Lille
+# Copyright (c) 2019, INRIA
+# Copyright (c) 2019, University of Lille
 # All rights reserved.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,15 +17,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from pyRAPL.device import Device
-from pyRAPL.exception import PyRAPLException, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
-from pyRAPL.exception import PyRAPLCantRecordEnergyConsumption
-from pyRAPL.device_api import DeviceAPI, PkgAPI, DramAPI, DeviceAPIFactory
-from pyRAPL.sensor import Sensor
-from pyRAPL.result import Result
-from pyRAPL.pyRAPL import setup
-from pyRAPL.measurement import Measurement, measure
+import time
+import pytest
+import pymongo
+from mock import patch, Mock
 
-__version__ = "0.2.1"
+from pyRAPL import Result
+from pyRAPL.outputs import MongoOutput
 
-_sensor = None
+@patch('pymongo.MongoClient')
+def test_save(_):
+
+    output = MongoOutput(None, None, None)
+    output._collection.insert_many = Mock()
+    result = Result('toto', 0, 0.1, [0.1111, 0.2222], [0.3333, 0.4444])
+    output.add(result)
+    output.save()
+
+    args = output._collection.insert_many.call_args[0][0]
+
+    for i in range(2):
+        assert args[i]['label'] == result.label
+        assert args[i]['timestamp'] == result.timestamp
+        assert args[i]['duration'] == result.duration
+        assert args[i]['pkg'] == result.pkg[i]
+        assert args[i]['dram'] == result.dram[i]
+        assert args[i]['socket'] == i
