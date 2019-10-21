@@ -57,6 +57,24 @@ By default, **pyRAPL** monitors all the available devices of the machine's socke
 
 You can append the device `pyRAPL.Device.DRAM` to the `devices` parameter list to monitor RAM device too. 
 
+## Running the test multiple times 
+
+For short functions, you can configure the number of runs and it will calculate the mean energy consumption of all runs. 
+As an example if you want to run the test 100 times :
+
+	import pyRAPL
+
+	pyRAPL.setup()
+	
+	
+	@pyRAPL.measure(number=100)
+	def fun():
+		# Some stuff ...
+
+	for _ in range(100):
+		fun()
+	
+
 ## Configure the output of the decorator
 
 If you want to handle data with different output than the standard one, you can configure the decorator with an `Output` instance from the `pyRAPL.outputs` module.
@@ -77,7 +95,7 @@ As an example if you want to write the recorded energy consumption in a csv file
 	for _ in range(100):
 		fun()
 		
-	csv_output.save() 
+	csv_output.save()
 
 This will produce a csv file of 100 lines. Each line containing the energy
 consumption recorded during one execution of the function `fun`.

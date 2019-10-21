@@ -96,7 +96,7 @@ class Measurement:
 
 def measureit(_func=None, *, output: Output = None, number: int = 1):
     """
-    Measure the energy consumption of monitored devices during the execution of the decorated function
+    Measure the energy consumption of monitored devices during the execution of the decorated function (if multiple runs it will measure the mean energy)
 
     :param output: output instance that will receive the power consummation data
     :param number: number of iteration in the loop in case you need multiple runs or the code is too fast to be measured
