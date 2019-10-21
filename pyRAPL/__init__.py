@@ -24,6 +24,7 @@
 
 from pyRAPL.pyRAPL import PyRAPL, Device, Measure, measure, PyRAPLException, PyRAPLNoEnergyConsumptionRecordedException
 from pyRAPL.pyRAPL import PyRAPLNoEnergyConsumptionRecordStartedException, PyRAPLCantRecordEnergyConsumption
+# from pyRAPL import Sample
 # from pyRAPL.pyRAPL import measure_energy
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
