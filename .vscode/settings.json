@@ -1,4 +1,14 @@
 {
     "python.pythonPath": "/bin/python3",
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": false,
+    "python.linting.pylamaEnabled": false,
+    "python.linting.enabled": true
 }

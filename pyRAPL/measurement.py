@@ -94,11 +94,12 @@ class Measurement:
         return self._results
 
 
-def measure(_func=None, *, output: Output = None):
+def measureit(_func=None, *, output: Output = None, number: int = 1):
     """
     Measure the energy consumption of monitored devices during the execution of the decorated function
 
     :param output: output instance that will receive the power consummation data
+    :param number: number of iteration in the loop in case you need multiple runs or the code is too fast to be measured
     """
 
     def decorator_measure_energy(func):
@@ -106,8 +107,10 @@ def measure(_func=None, *, output: Output = None):
         def wrapper_measure(*args, **kwargs):
             sensor = Measurement(func.__name__, output)
             sensor.begin()
-            val = func(*args, **kwargs)
+            for i in range(number):
+                val = func(*args, **kwargs)
             sensor.end()
+            sensor._results = sensor._results / number
             sensor.export()
             return val
         return wrapper_measure

@@ -42,3 +42,13 @@ class Result:
     duration: float
     pkg: Optional[List[float]] = None
     dram: Optional[List[float]] = None
+
+    def __truediv__(self, number: int):
+        """ devide all the attributes by the number number , used to measure one instance if we run the test inside a loop
+        :param number: inteager
+        """
+
+        _duration = self.duration / number
+        _pkg = [j / number for j in self.pkg]
+        _dram = [j / number for j in self.dram]
+        return Result(self.label, self.timestamp, _duration, _pkg, _dram)

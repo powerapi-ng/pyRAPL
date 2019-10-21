@@ -24,7 +24,7 @@ from pyRAPL.device_api import DeviceAPI, PkgAPI, DramAPI, DeviceAPIFactory
 from pyRAPL.sensor import Sensor
 from pyRAPL.result import Result
 from pyRAPL.pyRAPL import setup
-from pyRAPL.measurement import Measurement, measure
+from pyRAPL.measurement import Measurement, measureit
 
 __version__ = "0.2.1"
 

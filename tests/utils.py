@@ -21,7 +21,7 @@
 from pyRAPL import Device
 import os
 import pytest
-import pyfakefs
+# import pyfakefs
 
 SOCKET_0_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:0'
 SOCKET_1_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:1'
@@ -53,6 +53,7 @@ def write_new_energy_value(val, device, socket_id):
     print(str(val) + '\n')
     api_file.write(str(val) + '\n')
     api_file.close()
+
 
 @pytest.fixture
 def empty_fs(fs):
@@ -101,6 +102,7 @@ def fs_two_socket(fs):
     fs.create_file(DRAM_1_DIR_NAME + '/name', contents='dram\n')
     fs.create_file(DRAM_1_FILE_NAME, contents=str(DRAM_1_VALUE) + '\n')
     return fs
+
 
 @pytest.fixture
 def fs_one_socket_no_dram(fs):

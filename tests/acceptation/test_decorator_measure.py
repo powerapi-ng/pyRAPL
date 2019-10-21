@@ -19,15 +19,17 @@
 # SOFTWARE.
 
 from tests.utils import fs_one_socket, write_new_energy_value, PKG_0_VALUE, DRAM_0_VALUE
-from mock import patch
-import time
+# from mock import patch
+# import time
 
 import pyRAPL
 
 POWER_CONSUMPTION_PKG = 20000
 POWER_CONSUMPTION_DRAM = 30000
+NUMBER_OF_ITERATIONS = 5
 
-def test_decorator_measure(fs_one_socket):
+
+def test_decorator_measureit(fs_one_socket):
     """
     Test to measure the energy consumption of a function using the measure decorator
 
@@ -44,7 +46,7 @@ def test_decorator_measure(fs_one_socket):
 
     csv_output = pyRAPL.outputs.CSVOutput('output.csv')
 
-    @pyRAPL.measure(output=csv_output)
+    @pyRAPL.measureit(output=csv_output, number=NUMBER_OF_ITERATIONS)
     def measurable_function(a):
         # Power consumption of the function
         write_new_energy_value(POWER_CONSUMPTION_PKG, pyRAPL.Device.PKG, 0)
@@ -66,7 +68,7 @@ def test_decorator_measure(fs_one_socket):
         content = line.split(',')
         print(content)
         assert content[0] == 'measurable_function'
-        assert content[3] == str((POWER_CONSUMPTION_PKG - PKG_0_VALUE) / 1000000)
-        assert content[4] == str((POWER_CONSUMPTION_DRAM - DRAM_0_VALUE) / 1000000)
+        assert content[3] == str((POWER_CONSUMPTION_PKG - PKG_0_VALUE) / 1000000 / NUMBER_OF_ITERATIONS)
+        assert content[4] == str((POWER_CONSUMPTION_DRAM - DRAM_0_VALUE) / 1000000 / NUMBER_OF_ITERATIONS)
 
     assert n_lines == 1

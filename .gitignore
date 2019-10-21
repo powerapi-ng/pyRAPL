@@ -3,6 +3,10 @@
 ### my local tests ### 
 test.py 
 
+#vscode settings 
+
+.vscode
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
