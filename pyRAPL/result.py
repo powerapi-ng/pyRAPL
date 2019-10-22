@@ -30,9 +30,9 @@ class Result:
     :vartype label: str
     :var timestamp: measurement's beginning time (expressed in seconds since the epoch)
     :vartype timestamp: float
-    :var duration:  measurement's duration (in seconds)
+    :var duration:  measurement's duration (in micro seconds)
     :vartype duration: float
-    :var pkg: list of the CPU energy consumption -expressed in Joules- (one value for each socket) if None, no CPU energy consumption was recorded
+    :var pkg: list of the CPU energy consumption -expressed in micro Joules- (one value for each socket) if None, no CPU energy consumption was recorded
     :vartype pkg: Optional[List[float]]
     :var dram: list of the RAM energy consumption -expressed in seconds- (one value for each socket) if None, no RAM energy consumption was recorded
     :vartype dram: Optional[List[float]]

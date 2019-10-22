@@ -252,7 +252,7 @@ def test_energy_one_file_socket_0(device_api_param, fs_one_socket):
     assert len(energy) == 1
     assert isinstance(energy[0], float)
 
-    assert energy[0] == device_api_param.socket0_value / 1000000
+    assert energy[0] == device_api_param.socket0_value
 
 
 def test_energy_two_files_socket_0(device_api_param, fs_two_socket):
@@ -271,7 +271,7 @@ def test_energy_two_files_socket_0(device_api_param, fs_two_socket):
     assert len(energy) == 1
     assert isinstance(energy[0], float)
 
-    assert energy[0] == device_api_param.socket0_value / 1000000
+    assert energy[0] == device_api_param.socket0_value
 
 
 def test_energy_two_files_socket_1(device_api_param, fs_two_socket):
@@ -292,7 +292,7 @@ def test_energy_two_files_socket_1(device_api_param, fs_two_socket):
 
     assert energy[0] == -1
     assert isinstance(energy[1], float)
-    assert energy[1] == device_api_param.socket1_value / 1000000
+    assert energy[1] == device_api_param.socket1_value
 
 
 def test_energy_two_files_socket_0_1(device_api_param, fs_two_socket):
@@ -313,8 +313,8 @@ def test_energy_two_files_socket_0_1(device_api_param, fs_two_socket):
     for val in energy:
         assert isinstance(val, float)
 
-    assert energy[0] == device_api_param.socket0_value / 1000000
-    assert energy[1] == device_api_param.socket1_value / 1000000
+    assert energy[0] == device_api_param.socket0_value
+    assert energy[1] == device_api_param.socket1_value
 
 
 def test_energy_two_files_socket_all(device_api_param, fs_two_socket):
@@ -335,8 +335,8 @@ def test_energy_two_files_socket_all(device_api_param, fs_two_socket):
     for val in energy:
         assert isinstance(val, float)
 
-    assert energy[0] == device_api_param.socket0_value / 1000000
-    assert energy[1] == device_api_param.socket1_value / 1000000
+    assert energy[0] == device_api_param.socket0_value
+    assert energy[1] == device_api_param.socket1_value
 
 
 def test_energy_two_files_socket_1_0(device_api_param, fs_two_socket):
@@ -357,8 +357,8 @@ def test_energy_two_files_socket_1_0(device_api_param, fs_two_socket):
     for val in energy:
         assert isinstance(val, float)
 
-    assert energy[0] == device_api_param.socket0_value / 1000000
-    assert energy[1] == device_api_param.socket1_value / 1000000
+    assert energy[0] == device_api_param.socket0_value
+    assert energy[1] == device_api_param.socket1_value
 
 
 ###########

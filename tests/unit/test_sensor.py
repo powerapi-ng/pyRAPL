@@ -92,8 +92,8 @@ class SensorParam:
 
         self.devices = devices
         self.sockets = sockets
-        self.one_socket_result = div_if_positive_list(one_socket_result, 1000000) if one_socket_result is not None else None
-        self.two_socket_result = div_if_positive_list(two_socket_result, 1000000)
+        self.one_socket_result = one_socket_result
+        self.two_socket_result = two_socket_result
         # assert False
 
 

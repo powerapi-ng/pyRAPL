@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import time
-import pytest
 
 from pyRAPL import Result
 from pyRAPL.outputs import PrintOutput
@@ -34,14 +33,14 @@ def test_non_raw_output():
     result = Result('toto', 0, 0.23456, [0.34567], [0.45678, 0.56789])
     correct_value = f"""Label : toto
 Begin : {time.ctime(result.timestamp)}
-Duration :     0.2346 s
+Duration :     0.2346 us
 -------------------------------
 PKG :
-\tsocket 0 :     0.3457
+\tsocket 0 :     0.3457 uJ
 -------------------------------
 DRAM :
-\tsocket 0 :     0.4568
-\tsocket 1 :     0.5679
+\tsocket 0 :     0.4568 uJ
+\tsocket 1 :     0.5679 uJ
 -------------------------------"""
     output = PrintOutput()
     print(output._format_output(result))

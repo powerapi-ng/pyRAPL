@@ -32,7 +32,15 @@ def measurable_function(a):
     return 1 + a
 
 
-def test_nomal_measure_bench(fs_one_socket):
+class dummyOutput(pyRAPL.outputs.Output):
+    data = None
+
+    def add(self, result: pyRAPL.Result):
+        self.data = result
+
+
+
+def test_context_measure(fs_one_socket):
     """
     Test to measure the energy consumption of a function using the Measurement class
 
@@ -46,10 +54,9 @@ def test_nomal_measure_bench(fs_one_socket):
         file
     """
     pyRAPL.setup()
-    measure = pyRAPL.Measurement('toto')
-    measure.begin()
-    measurable_function(1)
-    measure.end()
+    out = dummyOutput()
+    with pyRAPL.Measurement('toto', output=out):
+        measurable_function(1)
 
-    assert measure.result.pkg == [(POWER_CONSUMPTION_PKG - PKG_0_VALUE)]
-    assert measure.result.dram == [(POWER_CONSUMPTION_DRAM - DRAM_0_VALUE)]
+    assert out.data.pkg == [(POWER_CONSUMPTION_PKG - PKG_0_VALUE)]
+    assert out.data.dram == [(POWER_CONSUMPTION_DRAM - DRAM_0_VALUE)]

@@ -23,6 +23,7 @@ from typing import Optional, Tuple, List
 
 from pyRAPL import Device, PyRAPLCantInitDeviceAPI, PyRAPLBadSocketIdException
 
+
 def cpu_ids() -> List[int]:
     """
     return the cpu id of this machine
@@ -126,7 +127,7 @@ class DeviceAPI:
         for i in range(len(self._sys_files)):
             device_file = self._sys_files[i]
             device_file.seek(0, 0)
-            result[self._socket_ids[i]] = int(device_file.readline()) / 1000000
+            result[self._socket_ids[i]] = float(device_file.readline())
         return tuple(result)
 
 
@@ -168,6 +169,7 @@ class DramAPI(DeviceAPI):
             rapl_files.append(get_dram_file(socket_directory_name, rapl_socket_id))
 
         return rapl_files
+
 
 class DeviceAPIFactory:
     """

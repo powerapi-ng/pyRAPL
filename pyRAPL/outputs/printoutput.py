@@ -27,9 +27,9 @@ def print_energy(energy):
     s = ""
     for i in range(len(energy)):
         if isinstance(energy[i], float):
-            s = s + f"\n\tsocket {i} : {energy[i]: 10.4f}"
+            s = s + f"\n\tsocket {i} : {energy[i]: 10.4f} uJ"
         else:
-            s = s + f"\n\tsocket {i} : {energy[i]: 10.4f}"
+            s = s + f"\n\tsocket {i} : {energy[i]} uJ"
     return s
 
 
@@ -50,7 +50,7 @@ class PrintOutput(Output):
         if self._raw:
             return str(result)
         else:
-            s = f"""Label : {result.label}\nBegin : {time.ctime(result.timestamp)}\nDuration : {result.duration:10.4f} s"""
+            s = f"""Label : {result.label}\nBegin : {time.ctime(result.timestamp)}\nDuration : {result.duration:10.4f} us"""
             if result.pkg is not None:
                 s += f"""\n-------------------------------\nPKG :{print_energy(result.pkg)}"""
             if result.dram is not None:

@@ -19,7 +19,7 @@
 # SOFTWARE.
 import functools
 
-from time import time
+from time import time_ns
 from pyRAPL import Result
 from pyRAPL.outputs import PrintOutput, Output
 import pyRAPL
@@ -57,13 +57,23 @@ class Measurement:
         Start energy consumption recording
         """
         self._energy_begin = self._sensor.energy()
-        self._ts_begin = time()
+        self._ts_begin = time_ns()
+
+    def __enter__(self):
+        """use Measurement as a context """
+        self.begin()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """use Measurement as a context """
+        self.end()
+        if(exc_type is None):
+            self.export()
 
     def end(self):
         """
         End energy consumption recording
         """
-        ts_end = time()
+        ts_end = time_ns()
         energy_end = self._sensor.energy()
 
         delta = energy_end - self._energy_begin
@@ -73,7 +83,7 @@ class Measurement:
         dram = delta[1::2]  # get even numbers
         dram = dram if empty_energy_result(dram) else None  # set result to None if its contains only -1
 
-        self._results = Result(self.label, self._ts_begin, duration, pkg, dram)
+        self._results = Result(self.label, self._ts_begin / 1000000000, duration / 1000, pkg, dram)
 
     def export(self, output: Output = None):
         """

@@ -68,7 +68,7 @@ def test_decorator_measureit(fs_one_socket):
         content = line.split(',')
         print(content)
         assert content[0] == 'measurable_function'
-        assert content[3] == str((POWER_CONSUMPTION_PKG - PKG_0_VALUE) / 1000000 / NUMBER_OF_ITERATIONS)
-        assert content[4] == str((POWER_CONSUMPTION_DRAM - DRAM_0_VALUE) / 1000000 / NUMBER_OF_ITERATIONS)
+        assert content[3] == str((POWER_CONSUMPTION_PKG - PKG_0_VALUE) / NUMBER_OF_ITERATIONS)
+        assert content[4] == str((POWER_CONSUMPTION_DRAM - DRAM_0_VALUE) / NUMBER_OF_ITERATIONS)
 
     assert n_lines == 1
