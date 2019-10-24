@@ -131,7 +131,7 @@ pyRAPL allows also to measure a block of instructions using the Keyword ``with``
 
   import pyRAPL 
   pyRAPL.setup()
-  
+
   with pyRAPL.Measurement('toto'):
     # ...
     # Piece of code to measure energy consumption
@@ -155,5 +155,5 @@ To handle the measures instead of just printing them you can use any Output_ cla
     # Piece of code to measure energy consumption 
     # ...
   
-	dataoutput.data.head()
+  dataoutput.data.head()
 
