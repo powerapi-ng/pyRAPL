@@ -12,7 +12,7 @@ Functions
 
 Decorator
 =========
-.. autodecorator:: pyRAPL.measure
+.. autodecorator:: pyRAPL.measureit
 
 Class
 =====

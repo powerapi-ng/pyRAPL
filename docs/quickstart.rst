@@ -22,7 +22,7 @@ function ``fun()`` run the following code::
 
   pyRAPL.setup()
 
-  @pyRAPL.measure
+  @pyRAPL.measureit
   def fun():
     # Some stuff ...
 
@@ -41,7 +41,7 @@ By default, **pyRAPL** monitors all the available devices of the machine's socke
 
   pyRAPL.setup(devices=[pyRAPL.Device.PKG], socket_ids=[1])
 
-  @pyRAPL.measure
+  @pyRAPL.measureit
   def fun():
     # Some stuff ...
 
@@ -60,8 +60,8 @@ As an example if you want to run the test 100 times :
 	pyRAPL.setup()
 	
 	
-	@pyRAPL.measure(number=100)
-	def fun():
+	@pyRAPL.measureit(number=100)
+  def fun():
 		# Some stuff ...
 
 	for _ in range(100):
@@ -81,7 +81,7 @@ As an example if you want to write the recorded energy consumption in a csv file
   
   csv_output = pyRAPL.outputs.CSVOutput('result.csv')
   
-  @pyRAPL.measure(output=csv_output)
+  @pyRAPL.measureit(output=csv_output)
   def fun():
     # Some stuff ...
 
@@ -126,34 +126,34 @@ You can also use an output to handle this results, for example with the csv outp
 Measure the energy consumption of a block
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pyarpl allows also to measure a block of instructions using the Keyword ``with`` as the example below: 
+pyRAPL allows also to measure a block of instructions using the Keyword ``with`` as the example below::
 
 
-	import pyRAPL
-
-	pyRAPL.setup()
-	
-	whith pyRAPL.Measurement('toto'):
-	
-		# ...
-		# Piece of code to measure energy consumption 
+  import pyRAPL 
+  pyRAPL.setup()
+  
+  with pyRAPL.Measurement('toto'):
     # ...
+    # Piece of code to measure energy consumption
+    # ...
+
 	
 This will print the energy consumption of the block. 
-To handle the measures instead of just printing them you can use any Output_ class that you pass to the Measurement object. 
+To handle the measures instead of just printing them you can use any Output_ class that you pass to the Measurement object 
 
 .. _Output: https://pyrapl.readthedocs.io/en/latest/Outputs_API.html
 
+::
 
-	import pyRAPL
-	pyRAPL.setup()
-	
-	dataoutput= pyRAPL.outputs.DataFrameOutput()
+  import pyRAPL
+  pyRAPL.setup()
 
-	whith pyRAPL.Measurement('toto',output=dataoutput):
-	
-		# ...
-		# Piece of code to measure energy consumption 
+  dataoutput= pyRAPL.outputs.DataFrameOutput()  
+  with pyRAPL.Measurement('toto',output=dataoutput):
+  
     # ...
-
+    # Piece of code to measure energy consumption 
+    # ...
+  
 	dataoutput.data.head()
+
