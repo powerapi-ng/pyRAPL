@@ -121,3 +121,39 @@ You can get the result of the measures using the property : ``measure.result`` t
 .. _Result: https://pyrapl.readthedocs.io/en/latest/API.html#pyRAPL.Result
 
 You can also use an output to handle this results, for example with the csv output : ``measure.export(csv_output)``
+
+
+Measure the energy consumption of a block
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Pyarpl allows also to measure a block of instructions using the Keyword ``with`` as the example below: 
+
+
+	import pyRAPL
+
+	pyRAPL.setup()
+	
+	whith pyRAPL.Measurement('toto'):
+	
+		# ...
+		# Piece of code to measure energy consumption 
+    # ...
+	
+This will print the energy consumption of the block. 
+To handle the measures instead of just printing them you can use any Output_ class that you pass to the Measurement object. 
+
+.. _Output: https://pyrapl.readthedocs.io/en/latest/Outputs_API.html
+
+
+	import pyRAPL
+	pyRAPL.setup()
+	
+	dataoutput= pyRAPL.outputs.DataFrameOutput()
+
+	whith pyRAPL.Measurement('toto',output=dataoutput):
+	
+		# ...
+		# Piece of code to measure energy consumption 
+    # ...
+
+	dataoutput.data.head()
