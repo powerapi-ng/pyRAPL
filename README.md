@@ -17,16 +17,16 @@ More specifically, pyRAPL can measure the energy consumption of the following CP
 
 # Installation
 
-You can install pyRAPL with pip: `pip install pyRAPL`
+You can install **pyRAPL** with pip: `pip install pyRAPL`
 
 # Basic usage
 
-Here are some basic usages of pyRAPL. Please note that the reported energy consumption is not only the energy consumption of the code you are running. This includes the _global energy consumption_ of all the process running on the machine during this period, thus including the operating system and other applications.
+Here are some basic usages of **pyRAPL**. Please note that the reported energy consumption is not only the energy consumption of the code you are running. This includes the _global energy consumption_ of all the process running on the machine during this period, thus including the operating system and other applications.
 That is why we recommend to eliminate any extra programs that may alter the energy consumption of the machine hosting experiments and to keep _only_ the code under measurement (_i.e._, no extra applications, such as graphical interface, background running task...). This will give the closest measure to the real energy consumption of the measured code.
 
 ## Decorate a function to measure its energy consumption
 
-To measure the energy consumed by the machine during the execution of the function `fun()` run the following code :
+To measure the energy consumed by the machine during the execution of the function `foo()` run the following code:
 
 	import pyRAPL
 
@@ -38,7 +38,7 @@ To measure the energy consumed by the machine during the execution of the functi
 
 	foo()
 
-This will print in the console the recorded energy consumption of all the monitorable devices of the machine during the execution of function `foo`.
+This will print in the console the recorded energy consumption of all the CPU domains during the execution of function `foo`.
 
 ## Configure the decorator specifying the device to monitor
 
@@ -52,7 +52,7 @@ By default, **pyRAPL** monitors all the available devices of the CPU sockets.
 
 	@pyRAPL.measure
 	def foo():
-		# Some stuff ...
+		# Instructions to be evaluated.
 
 	foo()	
 
@@ -69,7 +69,7 @@ As an example, if you want to run the evaluation 100 times:
 	
 	
 	@pyRAPL.measure(number=100)
-	def fun():
+	def foo():
 		# Instructions to be evaluated.
 
 	for _ in range(100):
@@ -89,11 +89,11 @@ As an example, if you want to write the recorded energy consumption in a .csv fi
 	csv_output = pyRAPL.outputs.CSVOutput('result.csv')
 	
 	@pyRAPL.measure(output=csv_output)
-	def fun():
+	def foo():
 		# Instructions to be evaluated.
 
 	for _ in range(100):
-		fun()
+		foo()
 		
 	csv_output.save()
 
@@ -140,14 +140,14 @@ This will report the energy consumption of the block. To process the measurement
 	import pyRAPL
 	pyRAPL.setup()
 	
-	dataoutput= pyRAPL.outputs.DataFrameOutput()
+	report = pyRAPL.outputs.DataFrameOutput()
 
-	with pyRAPL.Measurement('bar',output=dataoutput):
+	with pyRAPL.Measurement('bar',output=report):
 		# ...
 		# Instructions to be evaluated.
-    		# ...
+		# ...
 
-	dataoutput.data.head()
+	report.data.head()
 
 # Miscellaneous
 
