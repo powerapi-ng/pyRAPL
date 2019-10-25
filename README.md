@@ -5,9 +5,9 @@
 
 
 # About
-pyRAPL is a software toolkit to measure the energy footprint of a host machine along the execution of a piece of Python code.
+**pyRAPL** is a software toolkit to measure the energy footprint of a host machine along the execution of a piece of Python code.
 
-pyRAPL uses the Intel "_Running Average Power Limit_" (RAPL) technology that estimates power consumption of a CPU.
+**pyRAPL** uses the Intel "_Running Average Power Limit_" (RAPL) technology that estimates power consumption of a CPU.
 This technology is available on Intel CPU since the [Sandy Bridge generation](https://fr.wikipedia.org/wiki/Intel#Historique_des_microprocesseurs_produits).
 
 More specifically, pyRAPL can measure the energy consumption of the following CPU domains:
@@ -21,8 +21,8 @@ You can install pyRAPL with pip: `pip install pyRAPL`
 
 # Basic usage
 
-Here are some basic usages of pyRAPL. Please note that the reported energy consumption is not only the energy consumption of the code you are running. This includes the **global energy consumption** of all the process running on the machine during this period, thus including the operating system and other applications.
-That is why we recommend to eliminate any extra programs that may alter the energy consumption of the machine hosting experiments and to keep **only** the code under measurement (_i.e._, no extra applications, such as graphical interface, background running task...). This will give the closest measure to the real energy consumption of the measured code.
+Here are some basic usages of pyRAPL. Please note that the reported energy consumption is not only the energy consumption of the code you are running. This includes the _global energy consumption_ of all the process running on the machine during this period, thus including the operating system and other applications.
+That is why we recommend to eliminate any extra programs that may alter the energy consumption of the machine hosting experiments and to keep _only_ the code under measurement (_i.e._, no extra applications, such as graphical interface, background running task...). This will give the closest measure to the real energy consumption of the measured code.
 
 ## Decorate a function to measure its energy consumption
 
@@ -153,7 +153,7 @@ This will report the energy consumption of the block. To process the measurement
 
 ## About
 
-**pyRAPL** is an open-source project developed by the [Spirals research group](https://team.inria.fr/spirals) (University of Lille and Inria) that is part of the [powerapi](http://powerapi.org) initiative.
+**pyRAPL** is an open-source project developed by the [Spirals research group](https://team.inria.fr/spirals) (University of Lille and Inria) that is part of the [PowerAPI](http://powerapi.org) initiative.
 
 The documentation is available [here](https://pyrapl.readthedocs.io/en/latest/).
 
