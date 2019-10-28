@@ -20,25 +20,26 @@ Welcome to pyRAPL's documentation!
 About
 =====
 
-pyRAPL is a toolkit that measures the energy consumption of a machine during the execution of a python piece of code.
+**pyRAPL** is a software toolkit to measure the energy footprint of a host machine along the execution of a piece of Python code.
 
-pyRAPL use the intel "Running Average Power Limit" (RAPL) technology that estimate energy consumption of internal devices. This technology is only available on Intel CPU with Sandy Bridge architecture or higher.
+**pyRAPL** uses the Intel "*Running Average Power Limit*" (RAPL) technology that estimates power consumption of a CPU. This technology is available on Intel CPU since the `Sandy Bridge`__ generation.
 
-pyRAPL can measure the energy consumption of the following devices:
+__ https://fr.wikipedia.org/wiki/Intel#Historique_des_microprocesseurs_produits
 
-- CPU socket package 
-- RAM (only on Xeon CPU architecture)
+More specifically, pyRAPL can measure the energy consumption of the following CPU domains:
+
+- CPU socket package
+- DRAM (for server architectures)
+- GPU (for client architectures)
 
 Miscellaneous
 =============
 
-PyRAPL is an open-source project developed by the `Spirals research group`__ (University of Lille and Inria) that take part of the [powerapi](powerapi.org) project.
+PyRAPL is an open-source project developed by the `Spirals research group`__ (University of Lille and Inria) that take part of the Powerapi_ initiative.
+
+.. _Powerapi: http://powerapi.org
 
 __ https://team.inria.fr/spirals
-
-The documentation is available here_.
-
-.. _here: https://pyrapl.readthedocs.io/en/latest/
 
 Mailing list and contact
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -50,6 +51,6 @@ You can follow the latest news and asks questions by subscribing to our :raw-rol
 Contributing
 ^^^^^^^^^^^^
 
-If you would like to contribute code you can do so through GitHub by forking the repository and sending a pull request.
+If you would like to contribute code you can do so via GitHub by forking the repository and sending a pull request.
 
-When submitting code, please make every effort to follow existing conventions and style in order to keep the code as readable as possible.
+When submitting code, please make every effort to follow existing coding conventions and style in order to keep the code as readable as possible.
