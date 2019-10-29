@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import Optional, List
+from typing import Optional, Dict, Tuple
 from dataclasses import dataclass
 
 
@@ -40,15 +40,14 @@ class Result:
     label: str
     timestamp: float
     duration: float
-    pkg: Optional[List[float]] = None
-    dram: Optional[List[float]] = None
+    energies: Optional[Dict[Tuple[int, str], float]] = None
 
-    def __truediv__(self, number: int):
-        """ devide all the attributes by the number number , used to measure one instance if we run the test inside a loop
-        :param number: inteager
-        """
+    # def __truediv__(self, number: int):
+    #     """ devide all the attributes by the number number , used to measure one instance if we run the test inside a loop
+    #     :param number: inteager
+    #     """
 
-        _duration = self.duration / number
-        _pkg = [j / number for j in self.pkg]
-        _dram = [j / number for j in self.dram]
-        return Result(self.label, self.timestamp, _duration, _pkg, _dram)
+    #     _duration = self.duration / number
+    #     _pkg = [j / number for j in self.pkg]
+    #     _dram = [j / number for j in self.dram]
+    #     return Result(self.label, self.timestamp, _duration, _pkg, _dram)

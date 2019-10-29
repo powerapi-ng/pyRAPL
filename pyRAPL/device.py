@@ -30,3 +30,5 @@ class Device(IntEnum):
     """
     PKG = 0
     DRAM = 1
+    CORE = 2
+    UNCORE = 3 

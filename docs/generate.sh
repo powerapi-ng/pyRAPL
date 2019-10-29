@@ -9,5 +9,5 @@ pip install pymongo
 pip install pandas
 sphinx-build ./ _build/
 make html
-deactivate
-rm -R ../venv
+# deactivate
+# rm -R ../venv

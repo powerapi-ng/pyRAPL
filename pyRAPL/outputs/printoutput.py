@@ -21,7 +21,7 @@ import time
 
 from pyRAPL import Result
 from pyRAPL.outputs import Output
-
+from tabulate import tabulate 
 
 def print_energy(energy):
     s = ""
@@ -50,12 +50,12 @@ class PrintOutput(Output):
         if self._raw:
             return str(result)
         else:
-            s = f"""Label : {result.label}\nBegin : {time.ctime(result.timestamp)}\nDuration : {result.duration:10.4f} us"""
-            if result.pkg is not None:
-                s += f"""\n-------------------------------\nPKG :{print_energy(result.pkg)}"""
-            if result.dram is not None:
-                s += f"""\n-------------------------------\nDRAM :{print_energy(result.dram)}"""
-                s += '\n-------------------------------'
+            energies = [[x, y] + [result.energies[x, y]] for x, y in result.energies]
+            table = tabulate(energies, headers=['Socket', 'Device', 'Energy (uJ)'], tablefmt="github", numalign="right", floatfmt=".2f")
+            s = f"""Label : {result.label}\nBegin : {time.ctime(result.timestamp)}\nDuration : {result.duration:10.4f} us
+
+{ table}
+            """
             return s
 
     def add(self, result: Result):

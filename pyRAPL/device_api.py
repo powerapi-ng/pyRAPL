@@ -52,6 +52,41 @@ def get_socket_ids() -> List[int]:
     return list(set(socket_id_list))
 
 
+def get_available_RAPL_devices(socket_id=0):
+    """return the available devices present in socket number socket_id
+    """
+
+    def add_RAPL_device(path, available_devices):
+        """
+        return the available devices present in a socket
+        """
+        try:
+            with open(path + '/name') as f:
+                name = f.readline()[:-1]
+            device_path = path + '/energy_uj'
+            assert os.path.exists(device_path)
+            available_devices[name] = device_path
+        except FileNotFoundError as f:
+            fname = f.filename.split('/')[-2]
+            logging.warning(f'there is no device in {fname} but we will explore its sub-tree')
+        
+        for f in os.listdir(path):
+            if f.startswith('intel-rapl:'):
+                add_RAPL_device(path + '/' + f, available_devices)
+
+    path = "/sys/devices/virtual/powercap/intel-rapl/intel-rapl:" + str(socket_id)
+    if not os.path.exists(path):
+        raise PyRAPLBadSocketIdException(socket_id)
+
+    available_devices = {}
+    add_RAPL_device(path, available_devices)
+    available_devices['pkg'] = available_devices.pop('package-' + str(socket_id))
+    return available_devices
+
+
+
+
+
 class DeviceAPI:
     """
     API to read energy consumption from sysfs
@@ -171,6 +206,56 @@ class DramAPI(DeviceAPI):
         return rapl_files
 
 
+class CoreAPI(DeviceAPI):
+
+    def __init__(self, socket_ids: Optional[int] = None):
+        DeviceAPI.__init__(self, socket_ids)
+
+    def _open_rapl_files(self):
+        directory_name_list = self._get_socket_directory_names()
+
+        def get_core_file(socket_directory_name, rapl_socket_id, ):
+            rapl_device_id = 0
+            while os.path.exists(socket_directory_name + '/intel-rapl:' + str(rapl_socket_id) + ':' +
+                                 str(rapl_device_id)):
+                dirname = socket_directory_name + '/intel-rapl:' + str(rapl_socket_id) + ':' + str(rapl_device_id)
+                f_device = open(dirname + '/name', 'r')
+                if f_device.readline() == 'core\n':
+                    return open(dirname + '/energy_uj', 'r')
+                rapl_device_id += 1
+            raise PyRAPLCantInitDeviceAPI()
+
+        rapl_files = []
+        for (socket_directory_name, rapl_socket_id) in directory_name_list:
+            rapl_files.append(get_core_file(socket_directory_name, rapl_socket_id))
+
+        return rapl_files
+
+class UnCoreAPI(DeviceAPI):
+
+    def __init__(self, socket_ids: Optional[int] = None):
+        DeviceAPI.__init__(self, socket_ids)
+
+    def _open_rapl_files(self):
+        directory_name_list = self._get_socket_directory_names()
+
+        def get_uncore_file(socket_directory_name, rapl_socket_id, ):
+            rapl_device_id = 0
+            while os.path.exists(socket_directory_name + '/intel-rapl:' + str(rapl_socket_id) + ':' +
+                                 str(rapl_device_id)):
+                dirname = socket_directory_name + '/intel-rapl:' + str(rapl_socket_id) + ':' + str(rapl_device_id)
+                f_device = open(dirname + '/name', 'r')
+                if f_device.readline() == 'uncore\n':
+                    return open(dirname + '/energy_uj', 'r')
+                rapl_device_id += 1
+            raise PyRAPLCantInitDeviceAPI()
+
+        rapl_files = []
+        for (socket_directory_name, rapl_socket_id) in directory_name_list:
+            rapl_files.append(get_uncore_file(socket_directory_name, rapl_socket_id))
+
+        return rapl_files
+
 class DeviceAPIFactory:
     """
     Factory Returning DeviceAPI
@@ -184,5 +269,9 @@ class DeviceAPIFactory:
         """
         if device == Device.PKG:
             return PkgAPI(socket_ids)
+        if device == Device.CORE:
+            return DramAPI(socket_ids)
+        if device == Device.UNCORE:
+            return DramAPI(socket_ids)
         if device == Device.DRAM:
             return DramAPI(socket_ids)

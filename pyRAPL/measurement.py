@@ -78,12 +78,9 @@ class Measurement:
 
         delta = energy_end - self._energy_begin
         duration = ts_end - self._ts_begin
-        pkg = delta[0::2]  # get odd numbers
-        pkg = pkg if empty_energy_result(pkg) else None  # set result to None if its contains only -1
-        dram = delta[1::2]  # get even numbers
-        dram = dram if empty_energy_result(dram) else None  # set result to None if its contains only -1
+        energies = {(self._sensor._offsets[i], self._sensor._devices[i]): delta[i] for i in range(len(delta))}
 
-        self._results = Result(self.label, self._ts_begin / 1000000000, duration / 1000, pkg, dram)
+        self._results = Result(self.label, self._ts_begin / 1000000000, duration / 1000, energies)
 
     def export(self, output: Output = None):
         """
