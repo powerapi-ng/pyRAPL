@@ -46,7 +46,9 @@ class CSVOutput(BufferedOutput):
 
         # Create file with header if it not exist or if append is False
         if not os.path.exists(self._filename) or not append:
-            header = separator.join(list(Result.__annotations__.keys()) + ['socket']) + '\n'
+            header = list(Result.__annotations__.keys()) + ['socket', 'device', 'energy']
+            header.remove("energies")
+            header = separator.join(header) + '\n'
 
             with open(self._filename, 'w+') as csv_file:
                 csv_file.writelines(header)

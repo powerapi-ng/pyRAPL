@@ -45,10 +45,11 @@ class BufferedOutput(Output):
         """
         x = dict(vars(result))
         x['timestamp'] = x['timestamp']
-        for i in range(len(result.pkg)):
+        x.pop('energies')
+        for (i, j), k in result.energies.items():
             x['socket'] = i
-            x['pkg'] = result.pkg[i]
-            x['dram'] = result.dram[i]
+            x['device'] = j
+            x['energy'] = k
             self._buffer.append(x.copy())
 
     @property

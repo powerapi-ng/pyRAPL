@@ -42,12 +42,10 @@ class Result:
     duration: float
     energies: Optional[Dict[Tuple[int, str], float]] = None
 
-    # def __truediv__(self, number: int):
-    #     """ devide all the attributes by the number number , used to measure one instance if we run the test inside a loop
-    #     :param number: inteager
-    #     """
-
-    #     _duration = self.duration / number
-    #     _pkg = [j / number for j in self.pkg]
-    #     _dram = [j / number for j in self.dram]
-    #     return Result(self.label, self.timestamp, _duration, _pkg, _dram)
+    def __truediv__(self, number: int):
+        """ devide all the attributes by the number number , used to measure one instance if we run the test inside a loop
+        :param number: inteager
+        """
+        _energies = {i: j / number for i, j in self.energies.items()}
+        _duration = self.duration / number
+        return Result(self.label, self.timestamp, _duration, _energies)

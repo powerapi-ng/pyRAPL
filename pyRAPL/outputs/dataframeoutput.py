@@ -31,7 +31,9 @@ class DataFrameOutput(Output):
     """
     def __init__(self):
         Output.__init__(self)
-        self._data_frame = pandas.DataFrame(columns=list(Result.__annotations__.keys()) + ["socket"])
+        header = list(Result.__annotations__.keys()) + ['socket', 'device', 'energy']
+        header.remove("energies")
+        self._data_frame = pandas.DataFrame(columns=header)
 
     def add(self, result):
         """
@@ -40,11 +42,12 @@ class DataFrameOutput(Output):
         :param result: data to add to the dataframe
         """
         x = dict(vars(result))
+        x.pop('energies')
         x['timestamp'] = time.ctime(x['timestamp'])
-        for i in range(len(result.pkg)):
+        for (i, j), k in result.energies.items():
             x['socket'] = i
-            x['pkg'] = result.pkg[i]
-            x['dram'] = result.dram[i]
+            x['device'] = j
+            x['energy'] = k
             self._data_frame = self._data_frame.append(x, ignore_index=True)
 
     @property
