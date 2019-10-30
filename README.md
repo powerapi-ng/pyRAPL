@@ -27,7 +27,7 @@ That is why we recommend to eliminate any extra programs that may alter the ener
 ## Decorate a function to measure its energy consumption
 
 To measure the energy consumed by the machine during the execution of the function `foo()` run the following code:
-
+```python
 	import pyRAPL
 
 	pyRAPL.setup() 
@@ -37,6 +37,7 @@ To measure the energy consumed by the machine during the execution of the functi
 		# Instructions to be evaluated.
 
 	foo()
+```
 
 This will print in the console the recorded energy consumption of all the CPU domains during the execution of function `foo`.
 
@@ -45,6 +46,7 @@ This will print in the console the recorded energy consumption of all the CPU do
 You can easily configure which device and which socket to monitor using the parameters of the `pyRAPL.setup` function. 
 For example, the following example only monitors the CPU power consumption on the CPU socket `1`.
 By default, **pyRAPL** monitors all the available devices of the CPU sockets.
+```python
 
 	import pyRAPL
 
@@ -55,6 +57,7 @@ By default, **pyRAPL** monitors all the available devices of the CPU sockets.
 		# Instructions to be evaluated.
 
 	foo()	
+```
 
 You can append the device `pyRAPL.Device.DRAM` to the `devices` parameter list to monitor RAM device too. 
 
@@ -62,7 +65,7 @@ You can append the device `pyRAPL.Device.DRAM` to the `devices` parameter list t
 
 For short functions, you can configure the number of runs and it will calculate the mean energy consumption of all runs. 
 As an example, if you want to run the evaluation 100 times:
-
+```python
 	import pyRAPL
 
 	pyRAPL.setup()
@@ -74,14 +77,14 @@ As an example, if you want to run the evaluation 100 times:
 
 	for _ in range(100):
 		foo()
-	
+```	
 
 ## Configure the output of the decorator
 
 If you want to handle data with different output than the standard one, you can configure the decorator with an `Output` instance from the `pyRAPL.outputs` module.
 
 As an example, if you want to write the recorded energy consumption in a .csv file:
-
+```python
 	import pyRAPL
 
 	pyRAPL.setup()
@@ -96,6 +99,7 @@ As an example, if you want to write the recorded energy consumption in a .csv fi
 		foo()
 		
 	csv_output.save()
+```
 
 This will produce a csv file of 100 lines. Each line containing the energy
 consumption recorded during one execution of the function `fun`.
@@ -108,7 +112,7 @@ You can also create your own Output class (see the
 
 To measure the energy consumed by the machine during the execution of a given
 piece of code, run the following code :
-
+```python
 	import pyRAPL
 
 	pyRAPL.setup()
@@ -118,7 +122,8 @@ piece of code, run the following code :
 	# Instructions to be evaluated.
 	# ...
 	meter.end()
-	
+```
+
 You can also access the result of the measurements by using the property `meter.result`, which returns a [`Result`](https://pyrapl.readthedocs.io/en/latest/API.html#pyRAPL.Result) object.
 
 You can also use an output to handle this results, for example with the .csv output: `meter.export(csv_output)`
@@ -126,17 +131,18 @@ You can also use an output to handle this results, for example with the .csv out
 ## Measure the energy consumption of a block 
 
 **pyRAPL** allows developers to measure a block of instructions using the keyword  ```with```  as the example below: 
-
+```python
 	import pyRAPL
 	pyRAPL.setup()
 	
-	whith pyRAPL.Measurement('bar'):
+	with pyRAPL.Measurement('bar'):
 		# ...
 		# Instructions to be evaluated.
 		# ...
+```
 
 This will report the energy consumption of the block. To process the measurements instead of printing them, you can use any [`Output`](https://pyrapl.readthedocs.io/en/latest/Outputs_API.html) class that you pass to the `Measurement` object:
-
+```python
 	import pyRAPL
 	pyRAPL.setup()
 	
@@ -148,6 +154,7 @@ This will report the energy consumption of the block. To process the measurement
 		# ...
 
 	report.data.head()
+```
 
 # Miscellaneous
 
