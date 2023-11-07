@@ -34,7 +34,7 @@ class Result:
     :vartype duration: float
     :var pkg: list of the CPU energy consumption -expressed in micro Joules- (one value for each socket) if None, no CPU energy consumption was recorded
     :vartype pkg: Optional[List[float]]
-    :var dram: list of the RAM energy consumption -expressed in seconds- (one value for each socket) if None, no RAM energy consumption was recorded
+    :var dram: list of the RAM energy consumption -expressed in micro Joules- (one value for each socket) if None, no RAM energy consumption was recorded
     :vartype dram: Optional[List[float]]
     """
     label: str
