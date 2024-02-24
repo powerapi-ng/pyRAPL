@@ -32,7 +32,7 @@ To measure the energy consumed by the machine during the execution of the functi
 
 	pyRAPL.setup() 
 
-	@pyRAPL.measure
+	@pyRAPL.measureit
 	def foo():
 		# Instructions to be evaluated.
 
@@ -52,7 +52,7 @@ By default, **pyRAPL** monitors all the available devices of the CPU sockets.
 
 	pyRAPL.setup(devices=[pyRAPL.Device.PKG], socket_ids=[1])
 
-	@pyRAPL.measure
+	@pyRAPL.measureit
 	def foo():
 		# Instructions to be evaluated.
 
@@ -71,7 +71,7 @@ As an example, if you want to run the evaluation 100 times:
 	pyRAPL.setup()
 	
 	
-	@pyRAPL.measure(number=100)
+	@pyRAPL.measureit(number=100)
 	def foo():
 		# Instructions to be evaluated.
 
@@ -91,7 +91,7 @@ As an example, if you want to write the recorded energy consumption in a .csv fi
 	
 	csv_output = pyRAPL.outputs.CSVOutput('result.csv')
 	
-	@pyRAPL.measure(output=csv_output)
+	@pyRAPL.measureit(output=csv_output)
 	def foo():
 		# Instructions to be evaluated.
 
