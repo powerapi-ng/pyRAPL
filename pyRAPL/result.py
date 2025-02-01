@@ -49,6 +49,6 @@ class Result:
         """
 
         _duration = self.duration / number
-        _pkg = [j / number for j in self.pkg]
-        _dram = [j / number for j in self.dram]
+        _pkg = [j / number for j in self.pkg] if self.pkg else None
+        _dram = [j / number for j in self.dram] if self.dram else None
         return Result(self.label, self.timestamp, _duration, _pkg, _dram)
