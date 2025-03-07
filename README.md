@@ -64,7 +64,7 @@ You can append the device `pyRAPL.Device.DRAM` to the `devices` parameter list t
 ## Running the test multiple times 
 
 For short functions, you can configure the number of runs and it will calculate the mean energy consumption of all runs. 
-As an example, if you want to run the evaluation 100 times:
+As an example if you want to average over 100 runs and repeat the experiment 20 times:
 ```python
 	import pyRAPL
 
@@ -75,7 +75,7 @@ As an example, if you want to run the evaluation 100 times:
 	def foo():
 		# Instructions to be evaluated.
 
-	for _ in range(100):
+	for _ in range(20):
 		foo()
 ```	
 
