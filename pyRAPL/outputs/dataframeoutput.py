@@ -22,30 +22,15 @@ import time
 import pandas
 
 from pyRAPL import Result
-from pyRAPL.outputs import Output
+from pyRAPL.outputs import BufferedOutput
 
 
-class DataFrameOutput(Output):
+class DataFrameOutput(BufferedOutput):
     """
     Append recorded data to a pandas Dataframe
     """
     def __init__(self):
-        Output.__init__(self)
-        self._data_frame = pandas.DataFrame(columns=list(Result.__annotations__.keys()) + ["socket"])
-
-    def add(self, result):
-        """
-        Append recorded data to the pandas Dataframe
-
-        :param result: data to add to the dataframe
-        """
-        x = dict(vars(result))
-        x['timestamp'] = time.ctime(x['timestamp'])
-        for i in range(len(result.pkg)):
-            x['socket'] = i
-            x['pkg'] = result.pkg[i]
-            x['dram'] = result.dram[i]
-            self._data_frame = self._data_frame.append(x, ignore_index=True)
+        BufferedOutput.__init__(self)
 
     @property
     def data(self) -> pandas.DataFrame:
@@ -54,4 +39,6 @@ class DataFrameOutput(Output):
 
         :return: the dataframe
         """
-        return self._data_frame
+        data_frame = pandas.DataFrame(self._buffer)
+        data_frame['timestamp'] = data_frame['timestamp'].map(lambda x: time.ctime(x))
+        return data_frame

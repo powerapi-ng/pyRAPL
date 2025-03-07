@@ -48,7 +48,7 @@ class BufferedOutput(Output):
         for i in range(len(result.pkg)):
             x['socket'] = i
             x['pkg'] = result.pkg[i]
-            x['dram'] = result.dram[i]
+            x['dram'] = result.dram[i] if result.dram else None
             self._buffer.append(x.copy())
 
     @property
